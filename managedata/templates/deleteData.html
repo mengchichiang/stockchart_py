@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>jQuery UI Sortable - Default functionality</title>
+  <script src="/static/include/jquery-2.1.4.min.js"></script>
+  <script src="/static/include/jquery-ui.min.js"></script>
+  <script src="http://code.highcharts.com/highcharts.js"></script>
+  <link rel="stylesheet" href="/static/stylesheet/jquery-ui.min.css">
+  <link rel="stylesheet" href="/static/stylesheet/style.css">
+  <style>
+  .ui-autocomplete.ui-widget { font-size: 0.8em; line-height:0.8em }
+  </style>
+</head>
+<body>
+<!-- home menu -->
+{% include "home_menu.html" %}
+ <hr><br>
+<!-- manageData menu -->
+<div class="portfolioMenu">
+<ul>
+  <li><a href="/manageData/download" target="_blank">downloadData</a></li>
+  <li><a href="#" onclick="cleanData()">Clean Data</a></li>
+  <li><a href="/manageData/deleteData" target="_blank">Delete Data</a></li>
+  <hr>
+</ul>
+</div>
+<script>
+
+function stockHistoryDelete(){
+  allDoneFlag = 0;
+  $.ajax({
+     type:"POST",
+     url:"/manageData/deleteData", //取得資料的頁面網址
+     data:$("form").serialize(),
+     dataType:"text", //server傳回的資料格式 
+     success: function(data) { $('form').append('<div>' + data + '</div>'); }, 
+     error: function () {  $('form').append('<div> delete fail!!!" </div>'); }
+  });   
+}
+
+$(document).ready(function(){
+  $("form").submit(function(){ //intercept form submit
+    $('input[type="submit"]').prop('disabled', true);
+    stockHistoryDelete();
+    return false;  //disable form submit to advoid change page.
+  });
+  $("#btnDeleteAll").on("click",function(){
+    {% for pfGroup in pfGroupArray %}
+      $("#checkbox{{pfGroup}}").attr("checked","checked");
+    {% endfor %}
+   $("form").submit();
+  }) 
+});
+</script>
+<br>
+<input type="button" id="btnDeleteAll" value="Delete all data" > <br>
+<br>
+<div> Select portfolio group to delete data: </div>
+<form name="StockDataDownload" method="post" >
+  {% for pfGroup in pfGroupArray  %}
+     <input type="checkbox" id="checkbox{{pfGroup}}" name="select{{pfGroup}}" value="on">{{pfGroup}}<br>
+  {% endfor %}
+<input type="submit"  value="Detele data" > <br>
+</form>
+<div id="serverMsg"></div>
+</body>
+</html>

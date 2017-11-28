@@ -1,0 +1,29 @@
+stockId,stockName,source
+INDEXDJX:.DJI,DOW JONES指數,google
+INDEXSP:.INX,S&P 500指數,google
+INDEXNASDAQ:.IXIC,NASDAQ指數,google
+INDEXFTSE:UKX,英國FTSE100指數,google
+INDEXEURO:PX1,法國CAC40指數,google
+INDEXDB:DAX,德國DAX指數,google
+INDEXNIKKEI:NI225,日經225指數,google
+SHA:000001,上海綜合指數,google
+INDEXHANGSENG:HSI,香港恆生指數,google
+TPE:TAIEX,台灣加權指數,google
+KRX:KOSPI,南韓綜合指數,google
+INDEXBOM:SENSEX,印度SENSEX指數,google
+TLV:KBVSP.50,巴西BOVESPA指數,google
+MCX:RTSI,俄羅斯RTS指數,google
+INDEXBKK:SET,泰國SET綜合指數,google
+^DJI,DOW JONES指數Y,yahoo
+^GSPC,S&P 500指數Y,yahoo
+^IXIC,NASDAQ指數Y,yahoo
+^SOX,費城半導體指數Y,yahoo
+^FTSE,英國FTSE100指數Y,yahoo
+^FCHI,法國CAC40指數Y,yahoo
+^GDXI,德國DAX指數Y,yahoo
+^N225,日經225指數Y,yahoo
+^KS11,南韓綜合指數Y,yahoo
+^HSI,香港恆生指數Y,yahoo
+^STI,新加坡海峽時報指數Y,yahoo
+^BSESN,印度SENSEX指數Y,yahoo
+^VIX,VIX指數Y,yahoo

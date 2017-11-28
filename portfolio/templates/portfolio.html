@@ -1,0 +1,232 @@
+<!doctype html>
+<html >
+<head>
+  <meta charset="utf-8">
+  <title>jQuery UI Sortable - Default functionality</title>
+  <script src="/static/include/jquery-2.1.4.min.js"></script>
+  <script src="/static/include/jquery-ui.min.js"></script>
+  <script src="http://code.highcharts.com/highcharts.js"></script>
+  <link rel="stylesheet" href="/static/stylesheet/jquery-ui.min.css">
+  <link rel="stylesheet" href="/static/stylesheet/style.css">
+  <style>
+  .ui-autocomplete.ui-widget { font-size: 0.8em; line-height:0.8em }
+  </style>
+</head>
+<body>
+{% include "home_menu.html" %}
+ <hr><br>
+<!-- portfolio menu -->
+<div class="portfolioMenu">
+  <span> Group </span> 
+  {% for pfGroup in pfGroupArray  %}
+     <a href="/portfolio/{{pfGroup}}">{{pfGroup}}</a>
+  {% endfor %}
+
+<ul>
+  <li><a href="/portfolio/{{pfGroup}}/edit">EditPortfolio</a></li>
+  <li><a href="/portfolio/{{pfGroup}}/create">CreatePortfolio</a></li>
+  <li><a href="/portfolio/{{pfGroup}}/reorder">ReorderPortfolio</a></li>
+  <li><a href="/portfolio/{{pfGroup}}/delete">DeletePortfolio</a></li>
+  <li><a href="/portfolio/{{pfGroup}}/import">ImportPortfolio</a></li>
+  <li><a href="/portfolio/{{pfGroup}}/export">ExportPortfolio</a></li>
+  <hr>
+</ul>
+</div>
+
+<span>{{ pfGroup }}<span>
+<!-- portfolio tag -->
+{% for pfName  in pfNameArray  %}
+    <a href="/portfolio/{{pfGroup}}/pf{{ pfName.index }}"> {{ pfName.name }}</a>
+{% endfor %}
+<br>
+
+<!-- add Symbol  -->
+<form method="post" action="/portfolio/{{pfGroup}}/{{pfIndex}}/addSymbol" id="addSymbolForm">
+<input type="text" name="symbol" >
+<input type="submit" value="Add Symbol" class="AddSymbol" />
+</form>
+
+<div class="portfolioMenu" id="symbolMenu">
+ <ul>
+  <li><a href="/portfolio/{{pfGroup}}/{{pfIndex}}/edit">EditWatchList</a></li>
+  <li><a href="/portfolio/{{pfGroup}}/{{pfIndex}}/reorder">ReorderWatchList</a></li>
+  <li><a href="#" onclick="openChartWin( currentPf.stock_array[0].stockId, currentPf.stock_array[0].marketType, currentPf.stock_array[0].stockName, 0)">ChartWatchList</a></li><br>
+</a>
+ </ul>
+</div>
+
+
+<!-- show portfolio watchlist quote -->
+<script src="/static/include/jquery-2.1.4.min.js"></script>
+<script src="/static/include/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="/static/stylesheet/jquery-ui.min.css">
+<script>
+function openChartWin(stockId,marketType,stockName,index)
+{
+var chartUrl="/portfolio/" + "{{pfGroup}}" + "/" + "{{pfIndex}}" +  "/chart?stockId=" + stockId + 
+              "&marketType=" + marketType + "&stockName=" + stockName + "&index=" + index + "&period=0";
+
+  window.open(chartUrl,"chart","height=600,width=1000,location=no,scrollbars=no" );
+}
+  var patharray=window.location.pathname.split("/"),
+      pfGroup=patharray[2],
+      pfIndex=patharray[3];
+{% autoescape off %}
+  var currentPf={{ currentPortfolio }};
+{% endautoescape %}
+  var pfStock=[];
+$(document).ready(function() {
+    var trHTML = '';
+    var index, len, item, stockSymbol;
+    for (index = 0, len = currentPf.stock_array.length; index < len; ++index) {
+      pfStock=currentPf.stock_array[index];
+      stockSymbol = pfStock.stockId + pfStock.stockName;
+      if (pfStock.stockId == pfStock.stockName) stockSymbol = pfStock.stockId; //US stock just show stockId whatever it is in any group.
+      if (pfStock.marketType == "CUS") stockSymbol = pfStock.stockName; //CUS stock just show without market whatever it is in any group.
+      if (pfStock.marketType != pfGroup) stockSymbol = stockSymbol + "__" + pfStock.marketType;
+      trHTML= "<tr id=trid" + index   + ">" + 
+              "<td><a href=/portfolio/" + "{{pfGroup}}" + "/" + "{{pfIndex}}" + "/chart?stockId=" + pfStock.stockId + 
+              "&marketType=" + pfStock.marketType + "&stockName=" + pfStock.stockName + ">" + stockSymbol + "</a></td>" + 
+              "<td>" + item + "</td><td>" + item + "</td><td>" + item + "</td><td>" + item + "</td><td>" + item + 
+              "</td><td>" + item + "</td>" +
+              "<td><canvas width=122 height=20 style=\"display: block; margin: 0; padding: 0;\"></canvas></td>" +
+              "<td><input type=\"checkbox\" id=checkbox"  + index + "</td>" +
+              "</tr>";
+      $("#pfStockTable").append(trHTML);
+      queryLastStockData(pfStock,index); //update table content
+      queryStockDataClose(pfStock,index);
+    }
+  //console.log(currentPf.name);
+  //console.log(currentPf);
+  //alert(currentPf.name);
+  $("#pfStockTableTitle").text(currentPf.name);
+  $("tr:even").addClass("even");  //add even row style
+  $("tr:odd").addClass("odd");  //add odd row style
+  //處理Delete和addSymbol  
+  $('#btnDelete').on('click', delete_stockSymbol);
+  $('#addSymbolForm').on('mouseenter','input[type=\'text\']',function () {
+     $(this).autocomplete({source: "/portfolio/" + pfGroup + "/" + pfIndex + "/getStockNameAuto", delay: 1000, minLength: 0});//送出get qrystring為term=XXXX
+  });
+  $("[id^='trid'] td").eq(0).css("width","200") // set stockId column width
+  $("[id^='trid'] td").eq(7).css("width","122") // set half year chart column width
+  $("#pfStockTable").on('click',"[id^='trid'] td a",function(){
+     //console.log($(this).parents("[id^=trid]").attr('id'));  
+     var clickNo=$(this).parents("[id^=trid]").attr('id').replace("trid","");  
+     //console.log(clickNo);
+     openChartWin( currentPf.stock_array[clickNo].stockId, currentPf.stock_array[clickNo].marketType, currentPf.stock_array[clickNo].stockName, clickNo);
+     return false; 
+   });
+});
+function delete_stockSymbol(){
+  $("input:checkbox").each(function(){ 
+    if (this.checked){
+      var i;
+      i=parseInt(this.id.replace("checkbox",""));
+      delete currentPf.stock_array[i];
+    } 
+  }); 
+  //console.log(JSON.parse(JSON.stringify(currentPf.stock_array))); 
+  // Delete selected portfolio in portfolio array
+  for(i=0,j=0, Count=currentPf.stock_array.length; i< Count ; i++){
+    if (currentPf.stock_array[j]==null) { 
+      currentPf.stock_array.splice(j,1);
+      j--;
+    }
+    j++;
+  }
+  //console.log(JSON.parse(JSON.stringify(currentPf.stock_array))); 
+  $.ajax({
+      type: 'POST',
+      url: '/portfolio/' + pfGroup +"/"+ pfIndex +'/updateWatchList',
+      data: JSON.stringify(currentPf), //data to be send //更新目前的portfolio
+      contentType: "application/json", //content type of send data
+      error: function (msg) { alert("AJAX Error" + msg.responseText); },
+      success: function(result) { window.location.reload(); }  //document.refer會返回呼叫此html的URL
+  }); 
+} 
+function queryLastStockData(pfStock,index){
+  $.ajax({
+      type: 'POST',
+      url: '/portfolio/' + pfGroup +"/"+ pfIndex +'/queryLastStockData',
+      data: JSON.stringify({'stockId':pfStock.stockId,'marketType':pfStock.marketType}), //data to be send
+      contentType: "application/json", //content type of send data
+      //contentType: "application/x-www-form-urlencoded", //content type of send data
+      error: function (msg) { alert("AJAX Error" + msg.responseText); },
+      success: function(stockData) {
+                 //console.log(stockData);
+                 //alert(stockData[0].close);
+                 var date=new Date(stockData[0].date);
+                 $("#trid"+index).children().eq(1).text(stockData[0].close);
+                 $("#trid"+index).children().eq(2).text(stockData[0].high);
+                 $("#trid"+index).children().eq(3).text(stockData[0].low);
+                 $("#trid"+index).children().eq(4).text(stockData[0].open);
+                 $("#trid"+index).children().eq(5).text(stockData[0].volume);
+                 $("#trid"+index).children().eq(6).text(date.toLocaleDateString());
+               }
+  }); 
+} 
+function queryStockDataClose(pfStock,index){
+  $.ajax({
+      type: 'POST',
+      url: '/portfolio/' + pfGroup +"/"+ pfIndex +'/queryStockDataClose',
+      data: JSON.stringify({'stockId':pfStock.stockId,'marketType':pfStock.marketType}), //data to be send
+      contentType: "application/json", //content type of send data
+      //contentType: "application/x-www-form-urlencoded", //content type of send data
+      error: function (msg) { alert("AJAX Error" + msg.responseText); },
+      success: function(stockData) {  //get last 100 daily data               
+                 //console.log(stockData);
+                 var data=stockData.reverse();  //last date is first in stockData array
+                 var closeMin=Math.min(...data);
+                 var closeMax=Math.max(...data);
+                 var xSize=120,ySize=20;
+                 var xRatio= xSize/data.length;
+                 var yRatio= ySize/(closeMax-closeMin);
+                 var myCanvas =document.querySelector("#trid"+index + " canvas");
+                 var ctx = myCanvas.getContext("2d");                              
+                 ctx.moveTo(0,(ySize-(data[0] - closeMin)*yRatio));
+                 for(i=1; i<data.length ; i++) {
+                   x=i*xRatio
+                   y=ySize-(data[i] - closeMin)*yRatio
+                   ctx.lineTo(x,y);
+                  }
+                 ctx.stroke();    
+               }
+  }); 
+}
+</script>
+<style>
+  .even{ background-color:#EBF5FF;} //even row style
+  #pfStockTable { border:1px #cccccc solid;padding:1px; table-layout:fixed;}
+  #pfStockTable tr th,td { width: 100px; border:1px #cccccc solid;padding:1px;}
+  #pfStockTable tr th:first  { width: 300px; border:1px #cccccc solid;padding:1px;}
+  #pfStockTable tr td:first  { width: 300px; border:1px #cccccc solid;padding:1px;}
+  #pfStockTable tr th:last  { width: 300px; border:1px #cccccc solid;padding:1px;}
+</style>
+
+<div id="pfStockTableDiv">
+  <p id="pfStockTableTitle" ></p>
+    <table id="pfStockTable" cellpadding="0" cellspacing="0">
+        <tr><th class="columnSymbol">Symbol</th>
+            <th>close</th>
+            <th>open</th>
+            <th>high</th>
+            <th>low</th>
+            <th>volume</th>
+            <th>date</th>
+            <th>Half Year</th>
+            <th><input type="button" id="btnDelete" value="Delete" ></th>
+        </tr>
+    </table>
+    <span class="table_bottom"></span>
+</div>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+</body>
+</html>

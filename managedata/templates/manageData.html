@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>jQuery UI Sortable - Default functionality</title>
+  <script src="/static/include/jquery-2.1.4.min.js"></script>
+  <script src="/static/include/jquery-ui.min.js"></script>
+  <script src="http://code.highcharts.com/highcharts.js"></script>
+  <link rel="stylesheet" href="/static/stylesheet/jquery-ui.min.css">
+  <link rel="stylesheet" href="/static/stylesheet/style.css">
+  <style>
+  .ui-autocomplete.ui-widget { font-size: 0.8em; line-height:0.8em }
+  </style>
+</head>
+<body>
+<!-- home menu -->
+{% include "home_menu.html" %}
+ <hr><br>
+<!-- manageData menu -->
+<div class="portfolioMenu">
+<ul>
+  <li><a href="/manageData/download" target="_blank">Download Data</a></li>
+  <li><a href="#" onclick="cleanData()">Clean Data</a></li>
+  <li><a href="/manageData/deleteData" >Delete Data</a></li>
+  <hr>
+</ul>
+</div>
+<p id="manageDataStatus">"Clean Data" will delete the database data of stock not in portfolio.<BR>
+"Delete All Data" will delete the database data of all stock except portfolio.</p>
+<script>
+function cleanData() {
+    var x;
+    if (confirm("Are you sure to clean data?") == true) {
+        document.getElementById("manageDataStatus").innerHTML = "Clean data...";
+        $.get("/manageData/clean", function (data){
+        document.getElementById("manageDataStatus").innerHTML = data;
+        });
+    } else {
+        window.location.reload();
+    }
+}
+function deleteAllData() {
+    var x;
+    if (confirm("Are you sure to Delete data?") == true) {
+        document.getElementById("manageDataStatus").innerHTML = "Delete all data...";
+        $.get("/manageData/deleteAll", function (data){
+        document.getElementById("manageDataStatus").innerHTML = data;
+        });
+    } else {
+        window.location.reload();
+    }
+}
+
+</script>
+</body>
+</html>
