@@ -29,7 +29,7 @@ def my_auth(f):
       username, password = str(auth2).split(':')
       print(username)
       print(password)
-      if username == stockUtil.config["authentication"]["user"] and password == stockUtil.config["authentication"]["password"] : #set user and password
+      if username == stockUtil.read_config("authentication","user") and password == stockUtil.read_config("authentication","password") : #set user and password
         return f(request, *args, **kwargs)
     response = HttpResponse("Auth Required", status = 401)
     response['WWW-Authenticate'] = 'Basic realm="My Realm"'
@@ -47,7 +47,7 @@ def login_vf(request):
       #print(authtype)
       #print(auth2)
       username, password = str(auth2).split(':')
-      user = auth.authenticate(username=stockUtil.config["authentication"]["user"], password=stockUtil.config["authentication"]["password"])
+      user = auth.authenticate(username=stockUtil.read_config("authentication","user"), password=stockUtil.read_config("authentication","password"))
       if user is not None and user.is_active:
         auth.login(request, user) #maintain the state of login
         return HttpResponseRedirect("/portfolio/TW/pf0")

@@ -1,7 +1,10 @@
 from django.conf.urls import url, include
 from django.contrib import admin
 from portfolio.views import * 
+import lib.stockUtil as stockUtil
 
+
+pfGroupArray=stockUtil.evalTextArray(stockUtil.read_config("portfolio","pfGroupArray"))
 pfGroupPath=r'(?P<pfGroup>'+ '|'.join(pfGroupArray).replace("'","") + ')'
 #print(pfGroupPath)
 

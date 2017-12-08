@@ -32,7 +32,7 @@ class LoginRequiredMiddleware:
         #print(authtype)
         #print(auth2)
         username, password = str(auth2).split(':')
-        if username == stockUtil.config["authentication"]["user"] and password == stockUtil.config["authentication"]["password"] : #set user and password
+        if username == stockUtil.read_config("authentication","user") and password == stockUtil.read_config("authentication","password") : #set user and password
           return None
       response = HttpResponse("Auth Required", status = 401)
       response['WWW-Authenticate'] = 'Basic realm="My Realm"'

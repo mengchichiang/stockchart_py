@@ -1,29 +1,50 @@
 stockId,stockName,source
-INDEXDJX:.DJI,DOW JONES指數,google
-INDEXSP:.INX,S&P 500指數,google
-INDEXNASDAQ:.IXIC,NASDAQ指數,google
-INDEXFTSE:UKX,英國FTSE100指數,google
-INDEXEURO:PX1,法國CAC40指數,google
-INDEXDB:DAX,德國DAX指數,google
-INDEXNIKKEI:NI225,日經225指數,google
-SHA:000001,上海綜合指數,google
-INDEXHANGSENG:HSI,香港恆生指數,google
-TPE:TAIEX,台灣加權指數,google
-KRX:KOSPI,南韓綜合指數,google
-INDEXBOM:SENSEX,印度SENSEX指數,google
-TLV:KBVSP.50,巴西BOVESPA指數,google
-MCX:RTSI,俄羅斯RTS指數,google
-INDEXBKK:SET,泰國SET綜合指數,google
-^DJI,DOW JONES指數Y,yahoo
-^GSPC,S&P 500指數Y,yahoo
-^IXIC,NASDAQ指數Y,yahoo
-^SOX,費城半導體指數Y,yahoo
-^FTSE,英國FTSE100指數Y,yahoo
-^FCHI,法國CAC40指數Y,yahoo
-^GDXI,德國DAX指數Y,yahoo
-^N225,日經225指數Y,yahoo
-^KS11,南韓綜合指數Y,yahoo
-^HSI,香港恆生指數Y,yahoo
-^STI,新加坡海峽時報指數Y,yahoo
-^BSESN,印度SENSEX指數Y,yahoo
-^VIX,VIX指數Y,yahoo
+^DJI,DOW JONES指數y,yahoo
+^GSPC,S&P 500指數y,yahoo
+^IXIC,NASDAQ指數y,yahoo
+^SOX,費城半導體指數y,yahoo
+^TWII,台灣加權指數y,yahoo
+^N225,日經225指數y,yahoo
+^KS11,南韓綜合指數y,yahoo
+^HSI,香港恆生指數y,yahoo
+000001.SS,上海綜合指數y,yahoo
+^STI,新加坡海峽時報指數y,yahoo
+^FTSE,英國FTSE100指數y,yahoo
+^FCHI,法國CAC40指數y,yahoo
+^GDXI,德國DAX指數y,yahoo
+^BSESN,印度SENSEX指數y,yahoo
+^BVSP,巴西BOVESPA指數y,yahoo
+^RUT,Russell 2000指數y,yahoo
+^VIX,VIX指數y,yahoo
+index/DJIA,DOW JONES指數w,wsj
+index/SPX,S&P 500指數w,wsj
+index/COMP,NASDAQ指數w,wsj
+index/XX/Y9999,台灣加權指數w,wsj
+index/JP/NIK,日經225指數w,wsj
+index/KR/SEU,南韓綜合指數w,wsj
+index/CN/SHCOMP,上海綜合指數w,wsj
+index/HK/HSI,香港恆生指數w,wsj
+index/SG/STI,新加坡海峽時報指數w,wsj
+index/BR/BVSP,巴西BOVESPA指數w,wsj
+index/IN/1,印度SENSEX指數w,wsj
+index/AU/XJO,澳洲ASX 200指數w,wsj
+index/UK/UKX,英國FTSE100指數w,wsj
+index/DX/DAX,德國DAX指數w,wsj
+index/FR/PX1,法國CAC40指數w,wsj
+index/RUT,Russell 2000指數w,wsj
+index/TH/SET,泰國SET綜合指數w,wsj
+index/ID/JAKIDX,印尼綜合指數w,wsj
+INDEXDJX:.DJI,DOW JONES指數g,google
+INDEXSP:.INX,S&P 500指數g,google
+INDEXNASDAQ:.IXIC,NASDAQ指數g,google
+INDEXFTSE:UKX,英國FTSE100指數g,google
+INDEXEURO:PX1,法國CAC40指數g,google
+INDEXDB:DAX,德國DAX指數g,google
+INDEXNIKKEI:NI225,日經225指數g,google
+SHA:000001,上海綜合指數g,google
+INDEXHANGSENG:HSI,香港恆生指數g,google
+TPE:TAIEX,台灣加權指數g,google
+KRX:KOSPI,南韓綜合指數g,google
+INDEXBOM:SENSEX,印度SENSEX指數g,google
+TLV:KBVSP.50,巴西BOVESPA指數g,google
+MCX:RTSI,俄羅斯RTS指數g,google

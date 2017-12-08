@@ -8,7 +8,7 @@ PROJECT_ROOT = os.path.dirname(curDir) # mean cd..
 #print(sys.path)
 
 from lib.dbModel import db, Portfolio, HistoryData, StockInfo, ProjectInfo
-from lib.stockData import *
+import lib.stockData as stockData
 import lib.stockUtil as stockUtil
 
 from django.http import HttpResponse,HttpResponseRedirect, JsonResponse
@@ -20,10 +20,9 @@ import re
 import decimal
 import datetime
 
-pfGroupArray=stockUtil.evalTextArray(stockUtil.config["portfolio"]["pfGroupArray"])
-#print(pfGroupArray)
-
 def root_vf(request): #root of portfolio
+  pfGroupArray=stockUtil.evalTextArray(stockUtil.read_config("portfolio","pfGroupArray"))
+  #print(pfGroupArray)
   return HttpResponseRedirect("/portfolio/" + pfGroupArray[0])
 
 def createPortfolio(pfGroup, portfolioName, symbolArray): #market type TW inlculde OTC market.
@@ -206,6 +205,7 @@ def pfGroup_updatePortfolioList_vf(request,pfGroup): #ajax post json
   return HttpResponseRedirect("/portfolio/" + pfGroup + "/pf0")
 
 def pfGroup_pfIndex_vf(request,pfGroup,pfIndex):
+  pfGroupArray=stockUtil.evalTextArray(stockUtil.read_config("portfolio","pfGroupArray"))
   pfNameArray=[]
   #print("pfGroup:" + pfGroup) 
   #print("pfIndex:" + pfIndex) 
@@ -226,9 +226,8 @@ def pfGroup_pfIndex_vf(request,pfGroup,pfIndex):
 def pfGroup_pfIndex_addSymbol_vf(request,pfGroup,pfIndex): #form post
   pfIndexNo=int(pfIndex.replace("pf",""))
   if request.method == "POST":
-    stockSymbol22 = request.POST["symbol"]
-    if stockSymbol22 != "":
-      stockSymbol=stockSymbol22.upper()
+    stockSymbol = request.POST["symbol"]
+    if stockSymbol != "":
       stockSymbol1, marketType = stockUtil.parseInputSymbol(pfGroup, stockSymbol); #If stockSymbol=xxxx__xx, stockSymbol1=xxxxx
       stockName = stockUtil.getStockNameFromCSV(marketType ,stockSymbol1); #Assume input is stockId. if input not in CSV, stockName is set None 
       stockId = stockUtil.getStockIdFromCSV(marketType, stockSymbol1); #Assume input is stockName.  if input not in CSV, stockId is set None
@@ -239,10 +238,10 @@ def pfGroup_pfIndex_addSymbol_vf(request,pfGroup,pfIndex): #form post
       if stockId==None and stockName==None: 
         stockId=stockSymbol1;  #input can't found in csv Table
         stockName=stockId;  #input can't found in csv Table
-      print("stockId:" + stockUtil.cvNone(stockId))
-      print("stockName:" + stockUtil.cvNone(stockName))
-      print("marketType:" + stockUtil.cvNone(marketType))
-      print("stockSymbol1:" + stockUtil.cvNone(stockSymbol1))
+      #print("stockId:" + stockUtil.cvNone(stockId))
+      #print("stockName:" + stockUtil.cvNone(stockName))
+      #print("marketType:" + stockUtil.cvNone(marketType))
+      #print("stockSymbol1:" + stockUtil.cvNone(stockSymbol1))
       currentPortfolio = Portfolio.select().where(Portfolio.group  == pfGroup, Portfolio.index == pfIndexNo).dicts().first()
       if currentPortfolio != None:
         #print(currentPortfolio)
@@ -357,7 +356,7 @@ def pfGroup_pfIndex_queryStockDataClose_vf(request,pfGroup,pfIndex): #ajax POST.
 
 def pfGroup_pfIndex_chart_vf(request,pfGroup,pfIndex): #href link. render a new page.
   portfolioCount = Portfolio.select().where(Portfolio.group==pfGroup).count()
-  print(request.GET)
+  #print(request.GET)
   return render(request, "portfolioWatchList_chart.html", 
         { "stockObj":{"stockId":request.GET.get("stockId"), "marketType":request.GET.get("marketType"), "stockName":request.GET.get("stockName")},
                 "index":request.GET.get("index"), "period":request.GET.get("period"), "portfolioCount":portfolioCount})
@@ -365,7 +364,7 @@ def pfGroup_pfIndex_chart_vf(request,pfGroup,pfIndex): #href link. render a new 
 def pfGroup_pfIndex_queryStockData_vf(request,pfGroup,pfIndex): #ajax GET, send all history data of current stock for chart
   #print(request.GET.get("stockId"))
   #print(request.GET.get("marketType"))   
-  quotes=loadHistoryData(request.GET.get("stockId"), "history_" + request.GET.get("marketType").lower())
+  quotes=stockData.loadHistoryData(request.GET.get("stockId"), "history_" + request.GET.get("marketType").lower())
   return HttpResponse(json.dumps(quotes, cls=historyDataEncoder), content_type='application/json')
 
 

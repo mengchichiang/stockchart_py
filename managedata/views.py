@@ -7,9 +7,8 @@ import sys
 #print(sys.path)
 
 from lib.dbModel import db, Portfolio, HistoryData, StockInfo, ProjectInfo
-from lib.stockData import *
+import lib.stockData as stockData
 import lib.stockUtil as stockUtil
-import lib
 
 from django.http import HttpResponse,HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -20,9 +19,6 @@ import datetime
 
 pollMsgQueue=[]
 
-pfGroupArray=stockUtil.evalTextArray(stockUtil.config["portfolio"]["pfGroupArray"])
-#print(pfGroupArray)
-
 def downloadDataHistory(stockId, marketType):
   #dictText=StockInfo.select(StockInfo.history_info).where(StockInfo.stockid == stockId, StockInfo.markettype == marketType)
   qry=StockInfo.select().where(StockInfo.stockid == stockId, StockInfo.markettype == marketType).first()
@@ -31,21 +27,22 @@ def downloadDataHistory(stockId, marketType):
     q.execute()
     qry=StockInfo.select().where(StockInfo.stockid == stockId, StockInfo.markettype == marketType).first()
   historyInfoDict=stockUtil.evalTextDict(qry.history_info)
-  historyDoneYear=historyInfoDict["DoneYear"]
+  historyDoneYearAry=historyInfoDict["DoneYear"]
   #print(historyInfoDict)
-  fromYear  = stockUtil.config["stockData.history"]["from"]
   now=datetime.datetime.now()
   currentDate=now.strftime("%Y-%m-%d")
   currentYear=now.strftime("%Y")
-  toYear = currentYear;
+  rangeYears  = stockUtil.read_config("stockData.history","rangeYears")
+  fromYear = str(int(currentYear) - int(rangeYears) + 1)
+  toYear = currentYear
   print(stockId + " is being processed.")
   pollMsgQueue.append(stockId + " downloading...")
   for i in range(int(fromYear), int(toYear)+1):
     startDate = str(i) + "-01-01"
     endDate = str(i) + "-12-31"
     #print("processing year " + str(i) + "...")
-    #print(historyDoneYear)
-    if str(i) not in  historyDoneYear:
+    #print(historyDoneYearAry)
+    if str(i) not in  historyDoneYearAry:
       if str(i) == currentYear:
         setattr(HistoryData._meta, "db_table", "history_" + marketType.lower())
         lastData=HistoryData.select().where(HistoryData.stockid==stockId).order_by(HistoryData.date.desc()).first()
@@ -58,30 +55,31 @@ def downloadDataHistory(stockId, marketType):
       if marketType == "CUS":
         source=stockUtil.getSourceFromCustomCSV(marketType, stockId)
         if source == None:   #if symbol of CUS not list in custom.csv, get source from config.ini.
-          sourceDict=stockUtil.evalTextDict(stockUtil.config["stockData.history"]["source_" + marketType])
+          sourceDict=stockUtil.evalTextDict(stockUtil.read_config("stockData.history","source_" + marketType))
           source=sourceDict[marketId].lower()
       else:
-        sourceDict=stockUtil.evalTextDict(stockUtil.config["stockData.history"]["source_" + marketType])
+        sourceDict=stockUtil.evalTextDict(stockUtil.read_config("stockData.history","source_" + marketType))
         #print(sourceDict)
         #print("getHistorical_" + sourceDict[marketId].lower())
         #print(marketType.lower())
         source=sourceDict[marketId].lower()
       #print("Download from source:" + source)
-      getHistorical = getattr(lib.stockData,"getHistorical_" + source)
+      getHistorical = getattr(stockData,"getHistorical_" + source)
       quotes=getHistorical(stockId, marketType, startDate, endDate)  
-      saveHistoryData(stockId, quotes, "history_" + marketType.lower())
+      stockData.saveHistoryData(stockId, quotes, "history_" + marketType.lower())
       #print(quotes)
       if str(i) != currentYear:
-        historyInfoDict["DoneYear"].append(str(i))
-        q=StockInfo.update(history_info={'DoneYear':historyDoneYear}).where(StockInfo.id==qry.id)
+        historyDoneYearAry.append(str(i))
+        q=StockInfo.update(history_info={'DoneYear':historyDoneYearAry}).where(StockInfo.id==qry.id)
         q.execute()
   
 def downloadDataFinancial(stockId, marketType):
-  fromYear  = stockUtil.config["stockData.history"]["from"]
   now=datetime.datetime.now()
   currentDate=now.strftime('%Y-%m-%d')
   currentYear=now.strftime("%Y")
-  toYear = currentYear;
+  rangeYears  = stockUtil.read_config("stockData.history","rangeYears")
+  fromYear = str(int(currentYear) - int(rangeYears) + 1)
+  toYear = currentYear
   for i in range(int(fromYear), int(toYear)+1):
     startDate = str(i) + "-01-01"
     endDate = str(i) + "-12-31"
@@ -110,6 +108,7 @@ def root_vf(request):
 
 @csrf_exempt
 def downloadData_vf(request):
+  pfGroupArray=stockUtil.evalTextArray(stockUtil.read_config("portfolio","pfGroupArray"))
   if request.method == "GET":
     return render(request, "downloadData.html", {"pfGroupArray":pfGroupArray})
   else:
@@ -128,6 +127,7 @@ def status_vf(request): #ajax post
   return response
 
 def cleanData():
+  pfGroupArray=stockUtil.evalTextArray(stockUtil.read_config("portfolio","pfGroupArray"))
   allPfArray=[]  #collect all portfolio to allPfArray
   for pfGroup in pfGroupArray:
     qry = Portfolio.select().where(Portfolio.group == pfGroup).order_by(Portfolio.index)
@@ -163,7 +163,28 @@ def cleanData():
     if founded==0:    
       q = StockInfo.delete().where(StockInfo.id == x["id"])
       q.execute()
-
+  #Delete old data outside date of range year
+  now=datetime.datetime.now()
+  currentYear=now.strftime("%Y")
+  keepYears  = stockUtil.read_config("stockData.history","keepYears")
+  fromYear = str(int(currentYear) - int(keepYears) + 1)
+  for pfGroup in pfGroupArray:
+    setattr(HistoryData._meta, "db_table", "history_" + pfGroup.lower())
+    data1=HistoryData.select(HistoryData.stockid).distinct().dicts()
+    q = HistoryData.delete().where(HistoryData.date < fromYear + "-01-01")
+    q.execute()
+  #update DoneYear in StockInfo table
+  qry=StockInfo.select()
+  for item in qry:
+    historyInfoDict=stockUtil.evalTextDict(item.history_info)
+    historyDoneYearAry=historyInfoDict["DoneYear"]
+    array1=[]
+    for i in historyDoneYearAry:
+      if int(i) >= int(fromYear): 
+         array1.append(str(i))
+    q=StockInfo.update(history_info={'DoneYear':array1}).where(StockInfo.id==item.id)
+    q.execute()
+     
 #Delete the history & stockinfo data according to stockid not in portfolio.
 def cleanData_vf(request):
   try:
@@ -177,6 +198,7 @@ def cleanData_vf(request):
 
 @csrf_exempt
 def deleteData_vf(request):
+  pfGroupArray=stockUtil.evalTextArray(stockUtil.read_config("portfolio","pfGroupArray"))
   if request.method == "GET":
     return render(request, "deleteData.html", {"pfGroupArray":pfGroupArray})
   else:

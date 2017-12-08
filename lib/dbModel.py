@@ -4,12 +4,11 @@ PROJECT_ROOT = os.path.dirname(curDir) # mean cd..
 #print(PROJECT_ROOT)
 
 import lib.stockUtil as stockUtil
-pfGroupArray=stockUtil.evalTextArray(stockUtil.config["portfolio"]["pfGroupArray"])
 
 from peewee import *
 
-db = PostgresqlDatabase(threadlocals=True, database="stockdb", user=stockUtil.config["database.authentication"]["user"], 
-     password=stockUtil.config["database.authentication"]["password"], host="127.0.0.1", port="5432")
+db = PostgresqlDatabase(threadlocals=True, database="stockdb", user=stockUtil.read_config("database.authentication","user"), 
+     password=stockUtil.read_config("database.authentication","password"), host="127.0.0.1", port="5432")
 
 class Portfolio(Model):
   group = TextField() 
@@ -51,6 +50,7 @@ class ProjectInfo(Model):
 
 db.connect()
 Portfolio.create_table(True)
+pfGroupArray=stockUtil.evalTextArray(stockUtil.read_config("portfolio","pfGroupArray"))
 for pfGroup in pfGroupArray:
   setattr(HistoryData._meta, "db_table", "history_" + pfGroup.lower())
   HistoryData.create_table(True) #argument=True: create table if table not exist.
