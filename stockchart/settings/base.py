@@ -14,7 +14,7 @@ import os
 
 # Build paths inside the project like this: os.path.join(PROJECT_ROOT, ...)
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-STATIC_ROOT = os.path.join(PROJECT_ROOT, "static/") #for "python manage.py collectstatic" when deployment
+STATIC_ROOT = os.path.join(PROJECT_ROOT, "static/") #"python manage.py collectstatic" will copy all static files  to this floder.
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
@@ -23,9 +23,9 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, "static/") #for "python manage.py colle
 SECRET_KEY = 'gyw0n#f^f!yco1#-oa%=b-z^^nap7(p-be0*pyk55b0e2oymx2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#DEBUG = True
 
-ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -128,6 +128,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+#user defined static file directory for django STATICFILES_FINDERS when Debug=True
 STATICFILES_DIRS = (
     os.path.join(PROJECT_ROOT, "common_static"),
 )

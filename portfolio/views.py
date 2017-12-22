@@ -146,7 +146,7 @@ def pfGroup_export_vf(request,pfGroup):
         else:
           cell=stock["stockName"]
       else:  
-          cell = stock["stockId"] + "__" + stock["marketType"]
+          cell = stock["stockName"] + "__" + stock["marketType"]
       array[portfolio.index].append(cell)
   #print(array)
   result=list(itertools.zip_longest(*array))

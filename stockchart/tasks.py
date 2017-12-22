@@ -1,8 +1,7 @@
-from lib.stockData import *
 from lib.dbModel import db, Portfolio, HistoryData, StockInfo, ProjectInfo
 from lib import stockUtil
 
-pfGroupArray=stockUtil.evalTextArray(stockUtil.config["portfolio"]["pfGroupArray"])
+pfGroupArray=stockUtil.evalTextArray(stockUtil.read_config("portfolio","pfGroupArray"))
 
 #downlad data if download have not be done today.
 def downloadDataTask():

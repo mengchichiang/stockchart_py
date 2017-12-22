@@ -27,13 +27,13 @@ def searchStockNameFromCSV(marketType,queryString):
   regStr=  r'^(\d+)' + ' ' + r'(\S*' + queryString1 + r'\S*)$'  # 取出數字部份
   #print(regStr)
   if marketType=="TW":
-    text = open(PROJECT_ROOT + "/lib/台股上市公司20160324.csv").read()
+    text = open(PROJECT_ROOT + "/lib/台股上市公司20171219.csv").read()
     found=re.findall(regStr, text, re.M|re.I)
     #print(found)
     if found!=None:
       for a in found:
         ary.append(a[1])
-    text = open(PROJECT_ROOT + "/lib/台股上櫃公司20160324.csv").read()
+    text = open(PROJECT_ROOT + "/lib/台股上櫃公司20171219.csv").read()
     found=re.findall(regStr, text, re.M|re.I)
     #print(found)
     if found!=None:
@@ -67,7 +67,7 @@ def getStockNameFromCSV(marketType, stockId): #return None if stockId not found
   if marketType=="US": 
     return stockId
   if marketType=="TW": #找上市公司名單
-    text = open(PROJECT_ROOT + "/lib/台股上市公司20160324.csv").read()
+    text = open(PROJECT_ROOT + "/lib/台股上市公司20171219.csv").read()
     #print(text)
     found=re.search(regStr,text,re.M|re.I);
     if found!=None: 
@@ -77,7 +77,7 @@ def getStockNameFromCSV(marketType, stockId): #return None if stockId not found
       if found1!=None:
         return found1.group().strip() #返回上市公司名稱
     else:  #上市公司名單中找不到,改找上櫃公司名單
-      text = open(PROJECT_ROOT + "/lib/台股上櫃公司20160324.csv").read()
+      text = open(PROJECT_ROOT + "/lib/台股上櫃公司20171219.csv").read()
       #print(text)
       found=re.search(regStr,text,re.M|re.I);
       if found!=None:
@@ -118,12 +118,12 @@ def getStockIdFromCSV(marketType, stockName): #return None if stockName not foun
   regStr= r'^(\d+)' + ' ' + stockName + '$'  # digit
   if marketType=="US":  return stockName
   if marketType=="TW":
-    text = open(PROJECT_ROOT + "/lib/台股上市公司20160324.csv").read()
+    text = open(PROJECT_ROOT + "/lib/台股上市公司20171219.csv").read()
     found=re.search(regStr,text,re.M|re.I)
     if (found!=None):
       return found.group(1).strip()  #返回上市公司名稱
     else: 
-      text = open(PROJECT_ROOT + "/lib/台股上櫃公司20160324.csv").read()
+      text = open(PROJECT_ROOT + "/lib/台股上櫃公司20171219.csv").read()
       found=re.search(regStr,text,re.M|re.I)
       if found!=None:
         return found.group(1).strip()  #返回上櫃公司名稱
@@ -159,7 +159,7 @@ def getSourceFromCustomCSV(marketType, stockId): #return None if stockName not f
 
 def getMarketId(marketType, stockId):
   if marketType=="TW":  #台股上市或上櫃
-    text = open(PROJECT_ROOT + "/lib/台股上市公司20160324.csv").read()
+    text = open(PROJECT_ROOT + "/lib/台股上市公司20171219.csv").read()
     if re.search(stockId, text, re.M|re.I) != None:  return marketType
     else:  return 'TWO'
   if marketType=="US":

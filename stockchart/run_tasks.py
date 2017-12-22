@@ -2,14 +2,15 @@ import os
 curDir = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(curDir)
 #print(PROJECT_ROOT)
+
 import sys
 sys.path.append(PROJECT_ROOT) #add module search path
+#print(sys.path)
 
-from lib.stockData import *
 from lib.dbModel import db, Portfolio, HistoryData, StockInfo, ProjectInfo
-from lib import stockUtil
 
 from stockchart.tasks import downloadDataTask
+
 import threading
 import managedata.views
 

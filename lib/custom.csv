@@ -11,7 +11,7 @@ stockId,stockName,source
 ^STI,新加坡海峽時報指數y,yahoo
 ^FTSE,英國FTSE100指數y,yahoo
 ^FCHI,法國CAC40指數y,yahoo
-^GDXI,德國DAX指數y,yahoo
+^GDAXI,德國DAX指數y,yahoo
 ^BSESN,印度SENSEX指數y,yahoo
 ^BVSP,巴西BOVESPA指數y,yahoo
 ^RUT,Russell 2000指數y,yahoo

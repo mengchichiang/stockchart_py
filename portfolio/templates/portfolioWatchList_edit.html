@@ -104,7 +104,7 @@ function edit_save_click() {
   //sort portfolio array
   portfolio.stock_array.length=0
   for(i=0, stockCount=newArray.length; i< stockCount ; i++){
-    portfolio.stock_array.push( {stockId:newArray[i].stockId.toUpperCase(), stockName:newArray[i].stockName, marketType:newArray[i].marketType} );
+    portfolio.stock_array.push( {stockId:newArray[i].stockId, stockName:newArray[i].stockName, marketType:newArray[i].marketType} );
   }
   //console.log(portfolio); 
   $.ajax({
