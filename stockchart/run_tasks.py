@@ -18,7 +18,7 @@ def clearDownloadAccessFlag():
   db.get_conn()
   qry=ProjectInfo.select().first()
   if qry == None:
-    q=ProjectInfo.insert(**{"download_date":"2010-01-01","download_access":"TRUE"})
+    q=ProjectInfo.insert(**{"download_date":"2010-01-01","download_time":"00:00:00","download_access":"TRUE"})
     q.execute()
     qry=ProjectInfo.select().first()
   if qry != None:

@@ -162,6 +162,9 @@ function chartk(stockObj,chartPeriodSelect){
             '&marketType=' + stockObj.marketType + '&stockName=' + stockObj.stockName, function (data) {
         //console.log(JSON.parse(JSON.stringify(data)));
         data.sort(function(a,b){ return Date.parse(a.date)-Date.parse(b.date); });
+        for(i=0 ; i< data.length ; i++) {  //for pasre as UTC
+           data[i].date = data[i].date + 'Z'
+         } 
         //console.log(JSON.parse(JSON.stringify(data)));
         stockData=data;
         if ((stockObj.stockId==stockObj.stockName)||(stockObj.stockName=='null')) chartTitle=stockObj.stockId;

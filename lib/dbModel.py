@@ -44,6 +44,7 @@ class StockInfo(Model):
 class ProjectInfo(Model):
     download_access = TextField() #TRUE if access right is lock. Let download job is only one at the same time.
     download_date = TextField()
+    download_time = TextField()
     class Meta:
       database = db
       db_table = 'projectinfo'
