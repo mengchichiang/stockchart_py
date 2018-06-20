@@ -52,27 +52,25 @@ def downloadDataHistory(stockId, marketType):
       print("Download " + stockId + " from " + startDate + " to " + endDate)
       marketId=stockUtil.getMarketId(marketType, stockId)
       #print("marketId:" + marketId)
-      if marketType == "CUS":
-        source=stockUtil.getSourceFromCustomCSV(marketType, stockId)
-        if source == None:   #if symbol of CUS not list in custom.csv, get source from config.ini.
+      source=stockUtil.getSourceFromCustomCSV(marketType, stockId) #get source from custom table
+      if source==None: #get source from config.ini
+        if marketType in ["US","TW","HK"]:
           sourceDict=stockUtil.evalTextDict(stockUtil.read_config("stockData.history","source_" + marketType))
+          #print(sourceDict)
+          #print("getHistorical_" + sourceDict[marketId].lower())
+          #print(marketType.lower())
           source=sourceDict[marketId].lower()
-      else:
-        sourceDict=stockUtil.evalTextDict(stockUtil.read_config("stockData.history","source_" + marketType))
-        #print(sourceDict)
-        #print("getHistorical_" + sourceDict[marketId].lower())
-        #print(marketType.lower())
-        source=sourceDict[marketId].lower()
-      #print("Download from source:" + source)
-      #getHistorical = getattr(stockData,"getHistorical_" + source)
-      getHistorical = stockData.get_func_from_modStockData("getHistorical_" + source, source)
-      quotes=getHistorical(stockId, marketType, startDate, endDate)  
-      stockData.saveHistoryData(stockId, quotes, "history_" + marketType.lower())
-      #print(quotes)
-      if str(i) != currentYear:
-        historyDoneYearAry.append(str(i))
-        q=StockInfo.update(history_info={'DoneYear':historyDoneYearAry}).where(StockInfo.id==qry.id)
-        q.execute()
+      if source!=None: #get history data from source
+        #print("Download from source:" + source)
+        #getHistorical = getattr(stockData,"getHistorical_" + source)
+        getHistorical = stockData.get_func_from_modStockData("getHistorical_" + source, source)
+        quotes=getHistorical(stockId, marketType, startDate, endDate)  
+        stockData.saveHistoryData(stockId, quotes, "history_" + marketType.lower())
+        #print(quotes)
+        if str(i) != currentYear:
+          historyDoneYearAry.append(str(i))
+          q=StockInfo.update(history_info={'DoneYear':historyDoneYearAry}).where(StockInfo.id==qry.id)
+          q.execute()
   
 def downloadDataFinancial(stockId, marketType):
   now=datetime.datetime.now()

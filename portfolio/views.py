@@ -276,8 +276,8 @@ def pfGroup_pfIndex_updateWatchList_vf(request,pfGroup,pfIndex): #ajax POST.
   if request.method == "POST":
     body_unicode = request.body.decode('utf-8')
     updatePortfolio = json.loads(body_unicode)
-    print(updatePortfolio)
-    print(updatePortfolio["stock_array"])
+    #print(updatePortfolio)
+    #print(updatePortfolio["stock_array"])
     q=Portfolio.update(stock_array=updatePortfolio["stock_array"]).where(Portfolio.group == pfGroup, Portfolio.index == pfIndexNo)
     q.execute()
   return HttpResponseRedirect("/portfolio/" + pfGroup + "/"+ pfIndex)

@@ -1,0 +1,69 @@
+stockId,stockName,source
+8001.T,伊藤忠商事,yahoo
+8002.T,丸紅,yahoo
+8031.T,三井物產,yahoo
+8053.T,住友商事,yahoo
+8058.T,三菱商事,yahoo
+8306.T,三菱UFJ金融集團,yahoo
+8316.T,三井住友金融集團,yahoo
+8411.T,瑞穗金融集團,yahoo
+8601.T,大和證券集團,yahoo
+8604.T,野村控股,yahoo
+8750.T,第一生命保險,yahoo
+8766.T,東京海上控股,yahoo
+8801.T,三井不動產,yahoo
+8802.T,三菱地所,yahoo
+8830.T,住友不動產,yahoo
+4452.T,花王,yahoo
+4911.T,資生堂,yahoo
+8028.T,全家便利商店,yahoo
+2501.T,札幌啤酒,yahoo
+2502.T,朝日啤酒,yahoo
+2503.T,麒麟控股,yahoo
+2282.T,日本火腿,yahoo
+2914.T,日本菸草產業,yahoo
+6701.T,日本電氣 NEC,yahoo
+6702.T,富士通 Fujitsu,yahoo
+6724.T,精工愛普生Seiko Epson,yahoo
+6752.T,松下電器,yahoo
+6753.T,夏普,yahoo
+6758.T,索尼,yahoo
+6762.T,TDK,yahoo
+6764.T,三洋電機,yahoo
+6733.T,先鋒,yahoo
+6902.T,電裝DENSO,yahoo
+6952.T,卡西歐計算機,yahoo
+6963.T,Rohm,yahoo
+6971.T,京瓷,yahoo
+6976.T,太陽誘電,yahoo
+6981.T,村田製作所Murata,yahoo
+6501.T,日立製作所,yahoo
+6503.T,三菱電機,yahoo
+6506.T,安川電機Yasukawa ,yahoo
+6954.T,發那科 FANUC,yahoo
+7751.T,佳能,yahoo
+6857.T,Advantest,yahoo
+7201.T,日產自動車,yahoo
+7203.T,豐田自動車,yahoo
+7211.T,三菱自動車工業,yahoo
+7261.T,馬自達汽車,yahoo
+7267.T,本田技研工業,yahoo
+7270.T,富士重工業,yahoo
+7012.T,川崎重工業,yahoo
+7011.T,三菱重工業,yahoo
+6471.T,日本精工NSK,yahoo
+6367.T,大金工業,yahoo
+6531.T,日本製鋼所,yahoo
+6301.T,小松製作所Komatsu,yahoo
+6305.T,日立建機Hitachi Construction Machinery,yahoo
+7003.T,三井造船,yahoo
+4005.T,住友化學,yahoo
+3407.T,旭化成,yahoo
+4063.T,信越化學工業,yahoo
+4183.T,三井化學,yahoo
+4188.T,三菱化學控股,yahoo
+4901.T,富士軟片控股,yahoo
+4208.T,宇部興產,yahoo
+3436.T,SUMCO,yahoo
+4100.T,戶田工業,yahoo
+4217.T,日立化成,yahoo

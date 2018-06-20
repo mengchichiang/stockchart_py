@@ -82,7 +82,7 @@ $(document).ready(function() {
       pfStock=currentPf.stock_array[index];
       stockSymbol = pfStock.stockId + pfStock.stockName;
       if (pfStock.stockId == pfStock.stockName) stockSymbol = pfStock.stockId; //US stock just show stockId whatever it is in any group.
-      if (pfStock.marketType == "CUS") stockSymbol = pfStock.stockName; //CUS stock just show without market whatever it is in any group.
+      if ((pfStock.marketType != "TW") || (pfStock.marketType != "HK")) stockSymbol = pfStock.stockName; //CUS stock just show without market whatever it is in any group.
       if (pfStock.marketType != pfGroup) stockSymbol = stockSymbol + "__" + pfStock.marketType;
       trHTML= "<tr id=trid" + index   + ">" + 
               "<td><a href=/portfolio/" + "{{pfGroup}}" + "/" + "{{pfIndex}}" + "/chart?stockId=" + pfStock.stockId + 

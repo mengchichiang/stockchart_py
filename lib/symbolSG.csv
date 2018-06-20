@@ -1,0 +1,22 @@
+stockId,stockName,source
+ES3.SI,SPDR Straits Times Index ETF,yahoo
+Z74.SI,Singtel,yahoo
+CC3.SI,Starhub,yahoo
+D05.SI,DBS Group Holdings Ltd,yahoo
+O39.SI,Oversea-Chinese Banking Corporation Limited,yahoo
+U11.SI,United Overseas Bank Ltd,yahoo
+S68.SI,Singapore Exchange Limited,yahoo
+S08.SI,Sing Post,yahoo
+AZI.SI,AusNet Services Ltd,yahoo
+G13.SI,Genting Singapore,yahoo
+D01.SI,Dairy Farm International Holdings Ltd.,yahoo
+BN4.SI,Keppel Corporation Limited,yahoo
+A17U.SI,Ascendas Reit,yahoo
+C61U.SI,CapitaLand Commercial Trust,yahoo
+C38U.SI,CapitaMall Trust,yahoo
+C2PU.SI,ParkwayLife Reit,yahoo
+T82U.SI,Suntec Reit,yahoo
+N2IU.SI,Mapletree Commercial Trust,yahoo
+A68U.SI,Ascott Residence Trust,yahoo
+ME8U.SI,Mapletree Industrial Trust,yahoo
+M44U.SI,Mapletree Logistics Trust,yahoo

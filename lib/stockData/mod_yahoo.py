@@ -8,19 +8,8 @@ from lib.dbModel import db, Portfolio, HistoryData, StockInfo, ProjectInfo
 import lib.stockUtil as stockUtil
 import lib.stockData.util as stockDataUtil
 
-
-########### get data from yahoo  Start  ###################
-#資料來源: yahoo
-#可查美股, 台股上市櫃, 港股
-def getHistorical_yahoo(stockId, marketType, startDate, endDate): #return key:value
+def getHistorical_yahoo1(stockIdQry, stockId, startDate, endDate): #return key:value
   result=[]
-  if marketType == "TW":
-    marketId = stockUtil.getMarketId("TW", stockId)
-    stockIdQry = stockId + "." + marketId
-  elif marketType == "HK":
-    stockIdQry = "{:04d}".format(int(stockId)) + ".HK"
-  else:
-    stockIdQry = stockId
   dt1 = datetime.datetime.strptime(startDate,"%Y-%m-%d")
   endDt = datetime.datetime.strptime(endDate,"%Y-%m-%d")
   intervalDt = datetime.timedelta(days=50)
@@ -49,12 +38,34 @@ def getHistorical_yahoo(stockId, marketType, startDate, endDate): #return key:va
       return result
   return result
 
+########### get data from yahoo  Start  ###################
+#資料來源: yahoo
+#可查美股, 台股上市櫃, 港股
+def getHistorical_yahoo(stockId, marketType, startDate, endDate): #return key:value
+  result=[]
+  if marketType == "TW":
+    marketId = stockUtil.getMarketId("TW", stockId)
+    stockIdQry = stockId + "." + marketId
+  elif marketType == "HK":
+    stockIdQry = "{:04d}".format(int(stockId)) + ".HK"
+  else:
+    stockIdQry = stockId
+  result=getHistorical_yahoo1(stockIdQry, stockId, startDate, endDate)
+  if result==[] and marketType=="TW": #If marketId is wrong because of out of day CSV file, change marketId to another.
+    if marketId=="TW":
+      marketId="TWO"
+    else:
+      marketId="TW"
+    stockIdQry = stockId + "." + marketId
+    result=getHistorical_yahoo1(stockIdQry, stockId, startDate, endDate)
+  return result
+
 def parseYahooHistoryHtml(body, stockId):
   doc=pq(body)
   historyTable=doc("table[data-test='historical-prices']")
   #print(historyTable)
-  tr=historyTable.filter("table tr")
-  lentr=historyTable.filter("table tr").length 
+  tr=historyTable.filter("table tbody tr")
+  lentr=historyTable.filter("table tbody tr").length 
   #print(tr)
   result=[]
   for index in range(1,lentr,1):
@@ -68,8 +79,8 @@ def parseYahooHistoryHtml(body, stockId):
       strAdj  =tr.eq(index).children("td").eq(5).text().replace(",","") #Adj close* 
       strVolume =tr.eq(index).children("td").eq(6).text().replace(",","") #volume
       data=stockDataUtil.filterHistoryData(stockId, strDate, strOpen, strHigh, strLow, strClose, strVolume)
-      if data!={}: result.append(data)
       #print(data)
+      if data!={}: result.append(data)
   return result
 
 ########### get data from yahoo  End###################
