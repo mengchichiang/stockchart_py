@@ -16,6 +16,8 @@ import lib.stockData.util as stockDataUtil
 #可查台股上市
 #下載幾筆資料後會被拒絕連線
 def getHistorical_twse(stockId, marketType, startDate, endDate):
+  from fake_useragent import UserAgent
+  ua = UserAgent()
   startDate_year=parse(startDate).strftime("%Y")
   startDate_month=parse(startDate).strftime("%m")
   startDate_day=parse(startDate).strftime("%d")
@@ -33,8 +35,11 @@ def getHistorical_twse(stockId, marketType, startDate, endDate):
       twseHistoryUrl= ("http://www.twse.com.tw/exchangeReport/STOCK_DAY?response=csv" +
                            "&date=" + date1 + "&stockNo=" + stockId )
       print(twseHistoryUrl)
-      headers={'User-Agent':'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.73 Safari/537.36'}
+      user_agent = ua.random
+      headers = {'user-agent': user_agent}
+      #headers={'User-Agent':'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.73 Safari/537.36'}
       res = requests.post(twseHistoryUrl, headers=headers)
+      time.sleep(5)  # sleep=3 will fail, sleep=5 OK
       decoded_content = res.content.decode('Big5')
       #print(decoded_content.splitlines())
       ary=decoded_content.splitlines()
@@ -46,19 +51,18 @@ def getHistorical_twse(stockId, marketType, startDate, endDate):
       #print(ary1)
       for row in ary1:
         if len(row)==10:
-          strDate=row[0] #date
+          strDate=row[0] #date. date format 109/07/21
           strOpen=row[3].replace(",","") #open
           strHigh=row[4].replace(",","") #high
           strLow=row[5].replace(",","") #Low
           strClose=row[6].replace(",","") #Close
           strVolume=row[1].replace(",","") #volume
           if stockDataUtil.is_date(strDate) == True:
-            strDate1 = stockDataUtil.twYear2StandardYear(strDate)
+            strDate1 = stockDataUtil.twYear2StandardYear(strDate) # date format change to 19-07-21
             strVolume1=str(int(float(strVolume)))
             data=stockDataUtil.filterHistoryData(stockId, strDate1, strOpen, strHigh, strLow, strClose, strVolume1)
             if data!={}: result.append(data)
             #print(data)
-      time.sleep(3)  # sleep=1 will fail, sleep=2,3 OK
   return result
 
 def getHistorical_twse_old(stockId, marketType, startDate, endDate):
@@ -99,7 +103,7 @@ def getHistorical_twse_old(stockId, marketType, startDate, endDate):
         strLow  =tr.eq(index).children("td").eq(5).text().replace(",","") #low
         strClose=tr.eq(index).children("td").eq(6).text().replace(",","") #close 
         strVolume =tr.eq(index).children("td").eq(1).text().replace(",","") #volume
-        strDate1 = stockDataUtil.twYear2StandardYear(strDate)
+        strDate1 = parse(stockDataUtil.twYear2StandardYear(strDate)).strftime("%Y-%m-%d")
         strVolume1=str(int(int(strVolume)/1000))
         data=stockDataUtil.filterHistoryData(stockId, strDate1, strOpen, strHigh, strLow, strClose, strVolume1)
         if data!={}: result.append(data)
