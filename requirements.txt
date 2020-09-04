@@ -1,6 +1,6 @@
 requests==2.18.1
 python_dateutil==2.6.0
-Django==1.11.2
+Django==1.11.29
 peewee==2.10.1
 psycopg2==2.7.1
 pyquery==1.2.17
