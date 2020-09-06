@@ -19,13 +19,25 @@
 <!-- manageData menu -->
 <div class="portfolioMenu">
 <ul>
-  <li><a href="/manageData/download" target="_blank">downloadData</a></li>
+  <li><a href="/manageData/download" target="_blank">DownloadData</a></li>
   <li><a href="#" onclick="cleanData()">Clean Data</a></li>
-  <li><a href="/manageData/deleteData" target="_blank">Delete Data</a></li>
+  <li><a href="/manageData/deleteData" >Delete Data</a></li>
   <hr>
 </ul>
 </div>
 <script>
+
+function cleanData() {
+    var x;
+    if (confirm("Are you sure to clean data?") == true) {
+        document.getElementById("manageDataStatus").innerHTML = "Clean data...";
+        $.get("/manageData/clean", function (data){
+        document.getElementById("manageDataStatus").innerHTML = data;
+        });
+    } else {
+        window.location.reload();
+    }
+}
 
 function stockHistoryDelete(){
   allDoneFlag = 0;

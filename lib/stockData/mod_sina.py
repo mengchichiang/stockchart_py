@@ -5,6 +5,7 @@ from dateutil.parser import parse
 import datetime
 import pytz
 import csv
+import time
 from lib.dbModel import db, Portfolio, HistoryData, StockInfo, ProjectInfo
 import lib.stockUtil as stockUtil
 import lib.stockData.util as stockDataUtil
@@ -14,6 +15,8 @@ import lib.stockData.util as stockDataUtil
 #資料來源: 新浪網
 #可查港股 
 def getHistorical_sina(stockId, marketType, startDate, endDate):
+  from fake_useragent import UserAgent
+  ua = UserAgent()
   sinaHistoryUrl="http://stock.finance.sina.com.cn/hkstock/history/" + stockId +".html"
   print(sinaHistoryUrl)
   startDate_year=parse(startDate).strftime("%Y")
@@ -34,9 +37,12 @@ def getHistorical_sina(stockId, marketType, startDate, endDate):
       "season":str(qrySeason)
       }
       #print(payload)
-      headers={'User-Agent':'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.73 Safari/537.36'}
+      user_agent = ua.random
+      headers = {'user-agent': user_agent}
+      #headers={'User-Agent':'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.73 Safari/537.36'}
       res = requests.post(sinaHistoryUrl, data = payload, headers=headers)
       doc=pq(res.text)
+      time.sleep(1)
       historyTable=doc("table")
       tr=historyTable.filter("table tbody tr")
       lentr=historyTable.filter("table tbody tr").length

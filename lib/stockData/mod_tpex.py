@@ -16,13 +16,15 @@ import lib.stockData.util as stockDataUtil
 #可查台股上市櫃
 #例：下載CSV, "http://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_download.php?l=zh-tw&d=100/03&stkno=6121&s=0,asc,0";
 def getHistorical_tpex(stockId, marketType, startDate, endDate):
+  from fake_useragent import UserAgent
+  ua = UserAgent()
   startDate_year=parse(startDate).strftime("%Y")
   startDate_month=parse(startDate).strftime("%m")
-  startDate_day=parse(startDate).strftime("%-1d")
+  startDate_day=parse(startDate).strftime("%d")
   startDateStr= startDate_month + '+' + startDate_day + '+' + startDate_year
   endDate_year=parse(endDate).strftime("%Y")
   endDate_month=parse(endDate).strftime("%m")
-  endDate_day=parse(endDate).strftime("%-1d")  
+  endDate_day=parse(endDate).strftime("%d")  
   endDateStr= endDate_month + '+' + endDate_day + '+' + endDate_year
   #print(startDateStr + "to" + endDateStr)
   result=[]
@@ -31,9 +33,12 @@ def getHistorical_tpex(stockId, marketType, startDate, endDate):
       #print(str(qryYear) + "-" + str(qryMonth))
       tpexHistoryUrl="http://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_download.php?l=zh-tw&d=" + \
         str(qryYear-1911) + "/" + str(qryMonth)  +  "&stkno=" + stockId + "&s=0,asc,0";
-      headers={'User-Agent':'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.73 Safari/537.36'}
+      user_agent = ua.random
+      headers = {'user-agent': user_agent}
+      #headers={'User-Agent':'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.73 Safari/537.36'}
       print(tpexHistoryUrl)
-      res = requests.get(tpexHistoryUrl)
+      res = requests.get(tpexHistoryUrl,headers=headers)
+      time.sleep(5) 
       decoded_content = res.content.decode('Big5')
       #print(decoded_content.splitlines())
       ary=decoded_content.splitlines()
@@ -52,12 +57,11 @@ def getHistorical_tpex(stockId, marketType, startDate, endDate):
           strClose=row[6].replace(",","") #Close
           strVolume=row[1].replace(",","") #volume
           if stockDataUtil.is_date(strDate) == True:
-            strDate1 = stockDataUtil.twYear2StandardYear(strDate)
+            strDate1 = parse(stockDataUtil.twYear2StandardYear(strDate)).strftime("%Y-%m-%d")
             strVolume1=str(int(float(strVolume)))
             data=stockDataUtil.filterHistoryData(stockId, strDate1, strOpen, strHigh, strLow, strClose, strVolume1)
             if data!={}: result.append(data)
             #print(data)
-      time.sleep(3) 
   return result
 ########### get data from tpex End  ###################
 

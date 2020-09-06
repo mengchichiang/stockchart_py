@@ -19,8 +19,6 @@ def transfer2googleStockId(stockId,marketType):
     googleStockId="TPE:" + stockId
   if marketType=="HK":
     googleStockId="HKG:" + '{:0>4}'.format(stockId)
-  if marketType=="CUS":
-    googleStockId=stockId
   return(googleStockId)
 
 def getCid_google(stockId):
@@ -40,6 +38,8 @@ def getCid_google(stockId):
 """
 
 def getHistorical_google(stockId, marketType, startDate, endDate): #return key:value
+  from fake_useragent import UserAgent
+  ua = UserAgent()
   result=[]
   googleStockId=transfer2googleStockId(stockId,marketType)
   #print(googleStockId)
@@ -60,7 +60,9 @@ def getHistorical_google(stockId, marketType, startDate, endDate): #return key:v
     #googleFinanceUrl = "http://www.google.com/finance/historical?cid="  + cid +"&startdate="+dt1Str+"&enddate="+dt2Str+"&start=0&num=100"
     googleFinanceUrl = "http://www.google.com/finance/historical?q=" + googleStockId +"&startdate="+dt1Str+"&enddate="+dt2Str+"&start=0&num=100"
     print(googleFinanceUrl)
-    res = requests.get(googleFinanceUrl)
+    user_agent = ua.random
+    headers = {'user-agent': user_agent}
+    res = requests.get(googleFinanceUrl, headers=headers)
     statusCode = res.status_code
     #print(res.text)
     if statusCode == 200:
@@ -91,7 +93,8 @@ def parseGoogleHistoryHtml(body, stockId):
       strLow  =tr.eq(index).children("td").eq(3).text().replace(",","") #low
       strClose=tr.eq(index).children("td").eq(4).text().replace(",","") #close 
       strVolume =tr.eq(index).children("td").eq(5).text().replace(",","") #volume
-      data=stockDataUtil.filterHistoryData(stockId, strDate, strOpen, strHigh, strLow, strClose, strVolume)
+      strDate1=parse(strDate).strftime("%Y-%m-%d")
+      data=stockDataUtil.filterHistoryData(stockId, strDate1, strOpen, strHigh, strLow, strClose, strVolume)
       if data!={}: result.append(data)
       #print(data)
   return result

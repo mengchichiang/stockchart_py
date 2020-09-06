@@ -7,8 +7,15 @@ import lib.stockUtil as stockUtil
 
 from peewee import *
 
-db = PostgresqlDatabase(threadlocals=True, database="stockdb", user=stockUtil.read_config("database.authentication","user"), 
-     password=stockUtil.read_config("database.authentication","password"), host="127.0.0.1", port="5432")
+config_dbSel = stockUtil.read_config("database","database")
+if config_dbSel == None :
+  db = SqliteDatabase(stockUtil.read_config("database","FilePath"))
+elif config_dbSel.lower() == "postgresql":
+    db = PostgresqlDatabase("stockdb",threadlocals=True, user=stockUtil.read_config("database","user"), password=stockUtil.read_config("database","password"), host="127.0.0.1", port="5432")
+elif config_dbSel.lower() == "mysql":
+    db = MySQLsqlDatabase("stockdb", threadlocals=True, user=stockUtil.read_config("database","user"), password=stockUtil.read_config("database","password"), host="127.0.0.1", port="3306")
+else:
+    db = SqliteDatabase(stockUtil.read_config("database","FilePath"))
 
 class Portfolio(Model):
   group = TextField() 

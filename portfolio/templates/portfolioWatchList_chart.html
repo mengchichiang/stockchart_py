@@ -7,12 +7,13 @@
   <script src="/static/include/jquery-ui.min.js"></script>
   <link rel="stylesheet" href="/static/stylesheet/jquery-ui.min.css">
   <link rel="stylesheet" href="/static/stylesheet/style.css">
-  <script src="/static/include/highstock.src.js"></script>
-  <script src="/static/include/indicators.js"></script>
-  <script src="/static/include/sma.js"></script>
-  <script src="/static/include/ema.js"></script>
-  <script src="/static/include/rsi.js"></script>
-  <script src="/static/include/atr.js"></script>
+<script src="/static/include/highstock.js"></script>
+<script src="/static/include/indicators.js"></script>
+<script src="/static/include/stochastic.js"></script>
+<script src="/static/include/ema.js"></script>
+<script src="/static/include/macd.js"></script>
+<script src="/static/include/rsi.js"></script>
+<script src="/static/include/atr.js"></script>
   <style> .info {white-space:pre}</style>
   <script>
 {% autoescape off %}
@@ -165,7 +166,7 @@ function chartk(stockObj,chartPeriodSelect){
         for(i=0 ; i< data.length ; i++) {  //for pasre as UTC
            data[i].date = data[i].date + 'Z'
          } 
-        //console.log(JSON.parse(JSON.stringify(data)));
+        console.log(JSON.parse(JSON.stringify(data)));
         stockData=data;
         if ((stockObj.stockId==stockObj.stockName)||(stockObj.stockName=='null')) chartTitle=stockObj.stockId;
         else  chartTitle=stockObj.stockId + stockObj.stockName;
@@ -176,33 +177,24 @@ function chartk(stockObj,chartPeriodSelect){
             dataLength = data.length,
             groupingUnits=[],
             i = 0,dateRangeMinIndex,dateRangeMaxIndex;
-        var indicators = [];
-        var sma5  = { id: stockObj.stockId, type: 'sma', name: 'SMA5', params: { period: 5 },
-	              styles: { strokeWidth: 0.2, stroke: 'cadetblue', dashstyle: 'solid' }, showInLegend: true },
-            sma10 = { id: stockObj.stockId, type: 'sma', name: 'SMA10', params: { period: 10 }, 
-                      styles: { strokeWidth: 0.2, stroke: 'coral', dashstyle: 'solid' }, showInLegend: true }, 
-            sma20 = { id: stockObj.stockId, type: 'sma', name: 'SMA20', params: { period: 20 },
-	              styles: { strokeWidth: 0.2, stroke: 'violet', dashstyle: 'solid' }, showInLegend: true }, 
-            sma60 = { id: stockObj.stockId, type: 'sma', name: 'SMA60', params: { period: 60 },
-	              styles: { strokeWidth: 0.2, stroke: 'yellowgreen', dashstyle: 'solid' }, showInLegend: true },
-            sma50 = { id: stockObj.stockId, type: 'sma', name: 'SMA50', params: { period: 500 },
-	              styles: { strokeWidth: 0.2, stroke: 'yellowgreen', dashstyle: 'solid' }, showInLegend: true },
-            sma120 = { id: stockObj.stockId, type: 'sma', name: 'SMA120', params: { period: 120 },
-	              styles: { strokeWidth: 0.2, stroke: 'blue', dashstyle: 'solid' }, showInLegend: true },  
-            sma200 = { id: stockObj.stockId, type: 'sma', name: 'SMA200', params: { period: 200 },
-	              styles: { strokeWidth: 0.2, stroke: 'red', dashstyle: 'solid' }, showInLegend: true }, 
-            sma240 = { id: stockObj.stockId, type: 'sma', name: 'SMA240', params: { period: 240 },
-	              styles: { strokeWidth: 0.2, stroke: 'red', dashstyle: 'solid' }, showInLegend: true },
-            atr = { id: stockObj.stockId, type: 'atr', params: { period: 14 },
-	              styles: { strokeWidth: 0.2, stroke: 'red', dashstyle: 'solid' }, showInLegend: true },
-            //rsi must include ema.js
-            rsi = { id: stockObj.stockId, type: 'rsi', params: { period: 14, overbought: 70, oversold: 30 },
-		    styles: { strokeWidth: 2, stroke: 'black', dashstyle: 'solid' },
-		    yAxis: { lineWidth: 2, title: { text:'RSI' } }, showInLegend: true };
+        var sma = [];
+           sma5  = { type: 'sma', linkedTo: stockObj.stockId, params: { period: 5  },   lineWidth: 1.5, color: 'cadetblue', dashstyle: 'solid' , showInLegend: true ,tooltip: {  pointFormat: false }}
+           sma10  = { type: 'sma', linkedTo: stockObj.stockId, params: { period: 10  },   lineWidth: 1.5, color: 'coral', dashstyle: 'solid' , showInLegend: true ,tooltip: {  pointFormat: false }}
+           sma20  = { type: 'sma', linkedTo: stockObj.stockId, params: { period: 20  },   lineWidth: 1.5, color: 'violet', dashstyle: 'solid' , showInLegend: true ,tooltip: {  pointFormat: false }}
+           sma50  = { type: 'sma', linkedTo: stockObj.stockId, params: { period: 60  },   lineWidth: 1.5, color: 'yellowgreen', dashstyle: 'solid' , showInLegend: true ,tooltip: {  pointFormat: false }}
+           sma60  = { type: 'sma', linkedTo: stockObj.stockId, params: { period: 60  },   lineWidth: 1.5, color: 'yellowgreen', dashstyle: 'solid' , showInLegend: true ,tooltip: {  pointFormat: false }}
+           sma120  = { type: 'sma', linkedTo: stockObj.stockId, params: { period: 120  },   lineWidth: 1.5, color: 'blue', dashstyle: 'solid' , showInLegend: true ,tooltip: {  pointFormat: false }}
+           sma200  = { type: 'sma', linkedTo: stockObj.stockId, params: { period: 200  },   lineWidth: 1.5, color: 'red', dashstyle: 'solid' , showInLegend: true ,tooltip: {  pointFormat: false }}
+           sma240  = { type: 'sma', linkedTo: stockObj.stockId, params: { period: 240  },   lineWidth: 1.5, color: 'red', dashstyle: 'solid' , showInLegend: true ,tooltip: {  pointFormat: false }}
+           kd = { type: 'stochastic', linkedTo: stockObj.stockId, yAxis: 'yAxis3' , params: { period: [9,3] }, name: 'KD(9,3)' ,  lineWidth: 1.5, color: 'blue', dashstyle: 'solid',smoothedLine: {styles: { lineWidth: 1.5, lineColor: 'red' }} }
+           rsi = { type: 'rsi', linkedTo: stockObj.stockId, yAxis: 'yAxis3' , params: { period: 14, overbought: 70, oversold: 30 },  lineWidth: 1.5, color: 'black', dashstyle: 'solid' }                
+           atr = { type: 'atr', linkedTo: stockObj.stockId, yAxis: 'yAxis3', params: { period: 14 },  lineWidth: 1.5, color: 'red', dashstyle: 'solid' , showInLegend: true }
+           macd = { type: 'macd', linkedTo: stockObj.stockId, yAxis: 'yAxis3' , params: { longPeriod:26, shortPeriod:12, signalPeriod:9, period:26},  zones: [{ value: 0,  color: 'green'  }, { color: 'red' }],
+              macdLine: { styles: { lineWidth: 1.5, lineColor: 'orange' } }, signalLine: {styles: { lineWidth: 1.5, lineColor: 'blue' }} }
         if (chartPeriodSelect == 0) { 
           groupingUnits=[['day',[1]],['week',[1]]];  //select period is daily chart: range=9 month
           rangeSelect=2;  //will select rangeButton[2]
-          indicators=[sma5,sma10,sma20,sma60,sma120,sma240];
+          sma=[sma5,sma10,sma20,sma60,sma120,sma240];
 
           dateRangeMaxIndex=stockData.length-1;
           dateRangeMax=new Date(stockData[stockData.length-1].date);
@@ -222,7 +214,8 @@ function chartk(stockObj,chartPeriodSelect){
         if (chartPeriodSelect == 1) {
           groupingUnits=[['week',[1]]];  //select period is weekly chart: range=1 year
           rangeSelect=3; 
-          indicators=[sma20,sma60,sma120,sma240];
+          sma=[sma20,sma60,sma120,sma240];
+           kd = { type: 'stochastic', linkedTo: stockObj.stockId, yAxis: 'yAxis3' , params: { period: [9,3] }, name: 'KD(9,3)' ,  lineWidth: 1.5, color: 'blue', dashstyle: 'solid',smoothedLine: {styles: { lineWidth: 1.5, lineColor: 'red' }}, dataGrouping:{units:[['week',[1]]] } };
 
           dateRangeMaxIndex=stockData.length-1;
           dateRangeMax=new Date(stockData[stockData.length-1].date);
@@ -240,7 +233,8 @@ function chartk(stockObj,chartPeriodSelect){
           groupingUnits=[['month',[1]]]; //select period is monthly chart: renge=all
           rangeSelect=4; 
           console.log("chartPeriodSelect: " + chartPeriodSelect);
-          indicators=[sma20,sma60,sma120,sma240];
+          sma=[sma120,sma240];
+           kd = { type: 'stochastic', linkedTo: stockObj.stockId, yAxis: 'yAxis3' , params: { period: [9,3] }, name: 'KD(9,3)' ,  lineWidth: 1.5, color: 'blue', dashstyle: 'solid',smoothedLine: {styles: { lineWidth: 1.5, lineColor: 'red' }}, dataGrouping:{units:[['month',[1]]] } };
           dataRangeMax = Math.max.apply(Math,data.map(function(o){return o.high;}));
           dataRangeMin = Math.min.apply(Math,data.map(function(o){return o.high;}));
         }
@@ -263,53 +257,57 @@ function chartk(stockObj,chartPeriodSelect){
         //console.log("dataRangeMax: " + dataRangeMax);
         //console.log("dataRangeMin: " + dataRangeMin);
         //Highcharts.setOptions({ global: { useUTC: false } }); //set date in graph is local time.
-        $('#container').highcharts('StockChart', {
-           indicators: indicators,
-            tooltip:{ enabledIndicators: true },
+
+var     chart=Highcharts.stockChart('container', {
             rangeSelector: { buttons: rangeButton, selected: rangeSelect },
-            title: { text: chartTitle },
+            title: { text: chartTitle, margin:0 },
+            chart:{  marginRight:20,  height: '70%' },
             legend: {
                       enabled: true,
-                      floating:true, //true:legend can overlay with graph
+                      floating: true, //true:legend can overlay with graph
                       layout: 'horizontal',
                       align: 'center',
                       verticalAlign: 'top',
-                      x:0,y:40,
+                      itemDistance: 10,
+                      x:0,y:0,
                       borderWidth: 0
                     },
             xAxis:{  type: 'datetime',
-                   //  tickInterval: 2678400000, //tick every month
+                     tickInterval: 40 * 24 * 3600 * 1000, //tick every month
                      labels:{
                              formatter: function() {
 	                               var d = new Date(this.value);
                                        if (d.getMonth() == 0){
-                                       return Highcharts.dateFormat("%e. %b-%Y",this.value);
+                                       return Highcharts.dateFormat("%Y/%m",this.value);
                                        }else{
-                                       return Highcharts.dateFormat("%e. %b",this.value);
+                                       return Highcharts.dateFormat("%m",this.value);
                                        }                       
-                                   }            
-                   //  dateTimeLabelFormats: {
-                   //            month: '%e. %b',
-                     //          year: '%b'
-                       //      }
+                             } ,
+ 
                     },
-                  },
+             },
             yAxis: [{
-                labels: { align: 'right', x: -3 },
-                title: { text: 'OHLC' },
+                labels: { align: 'right', x: 20 },
+               // title: { text: 'OHLC' },
                 height: '90%',
                 lineWidth: 2,
                 max: dataRangeMax, 
                 min: dataRangeMin, 
-                maxPadding:0.01
+                maxPadding:0.01,
+                id: 'yAxis1'
                 }, {
-                labels: { align: 'right', x: -3 },
-                title: { text: 'Volume' },
-                top: '100%',
-                height: '20%',
+                labels: { align: 'right', x: 20 },
+                //title: { text: 'Volume' },
+                top: '90%',
+                height: '10%',
                 offset: 0,
                 lineWidth: 2,
+                id: 'yAxis2'
             }],
+				tooltip: {
+        	split: false,
+          shared: true
+        },
             series: [{
                 type: 'candlestick',
                 showInLegend: false,  
@@ -320,23 +318,30 @@ function chartk(stockObj,chartPeriodSelect){
                 data: ohlc,
                 dataGrouping: { units: groupingUnits, groupPixelWidth: 10 },
                 //pointInterval: 300 * 24 * 3600 * 1000
+                 yAxis: 'yAxis1',
                 }, {
-                showInLegend: false,  
                 type: 'column',
+                showInLegend: false,  
                 name: 'Volume',
                 data: volume,
-                yAxis: 1,
-                dataGrouping: { units: groupingUnits, groupPixelWidth: 12 }
-            }]
+                yAxis: 'yAxis2',
+               dataGrouping: { units: groupingUnits, groupPixelWidth: 12 }
+                }, ]
         });
         //setGraphRange();
+    sma.forEach(function(item) { chart.addSeries(item); })
+    //chart.addAxis({ labels: { align: 'right', x: 20 }, title: { text: 'KD',rotation:0, margin:10, y:25}, top: '90%', height: '10%',  offset: 0, lineWidth: 2, opposite: true,  id: 'yAxis3', min: 0,  max: 100, tickInterval: 50 }); 
+    //chart.addAxis({ labels: { align: 'right', x: 20 }, title: { text: 'RSI',rotation:0, margin:10, y:30}, top: '90%', height: '10%',  offset: 0, lineWidth: 2, opposite: true,  id: 'yAxis3', min: 0,  max: 100, tickInterval: 50 }); 
+    //chart.addAxis({ labels: { align: 'right', x: 20 }, title: { text: 'MACD',rotation:0, margin:10, y:30}, top: '90%', height: '10%',  offset: 0, lineWidth: 2, opposite: true,  id: 'yAxis3' }); 
+   //chart.addAxis({ labels: { align: 'right', x: 20 }, title: { text: 'ATR',rotation:0, margin:10, y:30}, top: '90%', height: '10%',  offset: 0, lineWidth: 2, opposite: true,  id: 'yAxis3' }); 
+   //chart.addSeries(kd); 
     });
 }
 
   </script>
 </head>
 <body>
-  <div id="container" style="min-width: 500x; height: 650px; margin: 0 auto"></div>
+  <div id="container" style="min-width: 500px; height: 100%; margin: 0 auto"></div>
   <div id="chartInfo" style="float:left" class="info" ></div>
   <div id="chartKeyInfo" style= "float:right" class="info" ></div>
 </body>

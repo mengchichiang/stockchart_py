@@ -15,10 +15,14 @@ import csv
 import ast
 import configparser
 
-def read_config(i, j):
+def read_config(section, setting):
   config = configparser.ConfigParser()
   config.read(PROJECT_ROOT + "/config.ini")
-  return config[i][j]
+  try:        
+       ret = config[section][setting]
+  except:
+         ret = None  #No Key in config section will return None
+  return ret
 
 def searchStockNameFromCSV(pfGroup,queryString):
   queryString1=queryString.upper()
@@ -27,27 +31,27 @@ def searchStockNameFromCSV(pfGroup,queryString):
   regStr=  r'^(\d+)' + ' ' + r'(\S*' + queryString1 + r'\S*)$'  # 取出數字部份
   #print(regStr)
   if pfGroup=="TW":
-    text = open(PROJECT_ROOT + "/lib/台股上市公司20171219.csv").read()
+    text = open(PROJECT_ROOT + "/lib/台股上市公司20200906.csv", encoding='utf8').read()
     found=re.findall(regStr, text, re.M|re.I)
     #print(found)
     if found!=None:
       for a in found:
         ary.append(a[1])
-    text = open(PROJECT_ROOT + "/lib/台股上櫃公司20171219.csv").read()
+    text = open(PROJECT_ROOT + "/lib/台股上櫃公司20200906.csv", encoding='utf8').read()
     found=re.findall(regStr, text, re.M|re.I)
     #print(found)
     if found!=None:
       for a in found:
         ary.append(a[1])
   if pfGroup=="HK":
-    text = open(PROJECT_ROOT + "/lib/港股代碼20160212.csv").read()
+    text = open(PROJECT_ROOT + "/lib/港股代碼20200906.csv", encoding='utf8').read()
     found=re.findall(regStr, text, re.M|re.I)
     if found!=None:
       #print(found)
       for a in found:
         ary.append(a[1])
   try:
-    f1 = open(PROJECT_ROOT + "/lib/symbol" + pfGroup +  ".csv",encoding="utf-8")
+    f1 = open(PROJECT_ROOT + "/lib/symbol" + pfGroup +  ".csv", encoding="utf8")
     reader=csv.reader(f1)
     fieldNames = reader.__next__()
     for row in reader:
@@ -58,9 +62,9 @@ def searchStockNameFromCSV(pfGroup,queryString):
     f1.close()
   except:
     pass
-  if pfGroup!="CUS":
+  if pfGroup!="CUS": #讓在TW,HK在addSymbol時也可以跳出CUS內的symbol
     try:
-      f1 = open(PROJECT_ROOT + "/lib/symbolCUS.csv",encoding="utf-8")
+      f1 = open(PROJECT_ROOT + "/lib/symbolCUS.csv", encoding="utf8")
       reader=csv.reader(f1)
       fieldNames = reader.__next__()
       for row in reader:
@@ -83,7 +87,7 @@ def getStockNameFromCSV(marketType, stockId): #return None if stockId not found
   if marketType=="US": 
     return stockId
   if marketType=="TW": #找上市公司名單
-    text = open(PROJECT_ROOT + "/lib/台股上市公司20171219.csv").read()
+    text = open(PROJECT_ROOT + "/lib/台股上市公司20200906.csv", encoding='utf8').read()
     #print(text)
     found=re.search(regStr,text,re.M|re.I);
     if found!=None: 
@@ -93,7 +97,7 @@ def getStockNameFromCSV(marketType, stockId): #return None if stockId not found
       if found1!=None:
         return found1.group().strip() #返回上市公司名稱
     else:  #上市公司名單中找不到,改找上櫃公司名單
-      text = open(PROJECT_ROOT + "/lib/台股上櫃公司20171219.csv").read()
+      text = open(PROJECT_ROOT + "/lib/台股上櫃公司20200906.csv", encoding='utf8').read()
       #print(text)
       found=re.search(regStr,text,re.M|re.I);
       if found!=None:
@@ -103,7 +107,7 @@ def getStockNameFromCSV(marketType, stockId): #return None if stockId not found
           return found1.group().strip() #返回上市公司名稱
       else:
         try:
-          f1 = open(PROJECT_ROOT + "/lib/symbol" + marketType +  ".csv",encoding="utf-8")
+          f1 = open(PROJECT_ROOT + "/lib/symbol" + marketType +  ".csv", encoding="utf8")
           reader=csv.reader(f1)
           fieldNames = reader.__next__()
           for row in reader:
@@ -121,7 +125,7 @@ def getStockNameFromCSV(marketType, stockId): #return None if stockId not found
       regStr= r'^(:?[0]*)' + stockId1 + " " + r'((:?\D+)(:?\w*))\n'; # 取出非數字部份
       #regStr= r'^(:?[0]*)' + stockId1 + " " + r'((:?\D)(:?[^\n]*$))'; # 取出非數字部份
       #print(regStr)
-      text = open(PROJECT_ROOT + "/lib/港股代碼20160212.csv").read()
+      text = open(PROJECT_ROOT + "/lib/港股代碼20200906.csv", encoding="utf8").read()
       #print(text)
       found=re.search(regStr,text,re.M|re.I)
       if found!=None: 
@@ -132,7 +136,7 @@ def getStockNameFromCSV(marketType, stockId): #return None if stockId not found
           return found1.group().strip() #返回港股公司名稱
       else:
         try:
-          f1 = open(PROJECT_ROOT + "/lib/symbol" + marketType +  ".csv",encoding="utf-8")
+          f1 = open(PROJECT_ROOT + "/lib/symbol" + marketType +  ".csv", encoding="utf8")
           reader=csv.reader(f1)
           fieldNames = reader.__next__()
           for row in reader:
@@ -143,7 +147,7 @@ def getStockNameFromCSV(marketType, stockId): #return None if stockId not found
           pass
       return None 
   try:
-      f1 = open(PROJECT_ROOT + "/lib/symbol" + marketType +  ".csv",encoding="utf-8")
+      f1 = open(PROJECT_ROOT + "/lib/symbol" + marketType +  ".csv", encoding="utf8")
       reader=csv.reader(f1)
       fieldNames = reader.__next__()
       for row in reader:
@@ -158,18 +162,18 @@ def getStockIdFromCSV(marketType, stockName): #return None if stockName not foun
   regStr= r'^(\d+)' + ' ' + stockName + '$'  # digit
   if marketType=="US":  return stockName
   if marketType=="TW":
-    text = open(PROJECT_ROOT + "/lib/台股上市公司20171219.csv").read()
+    text = open(PROJECT_ROOT + "/lib/台股上市公司20200906.csv", encoding='utf8').read()
     found=re.search(regStr,text,re.M|re.I)
     if (found!=None):
       return found.group(1).strip()  #返回上市公司名稱
     else: 
-      text = open(PROJECT_ROOT + "/lib/台股上櫃公司20171219.csv").read()
+      text = open(PROJECT_ROOT + "/lib/台股上櫃公司20200906.csv", encoding='utf8').read()
       found=re.search(regStr,text,re.M|re.I)
       if found!=None:
         return found.group(1).strip()  #返回上櫃公司名稱
       else:
         try:
-          f1 = open(PROJECT_ROOT + "/lib/symbol" + marketType +  ".csv",encoding="utf-8")
+          f1 = open(PROJECT_ROOT + "/lib/symbol" + marketType +  ".csv", encoding="utf8")
           reader=csv.reader(f1)
           fieldNames = reader.__next__()
           for row in reader:
@@ -180,13 +184,13 @@ def getStockIdFromCSV(marketType, stockName): #return None if stockName not foun
           pass
     return None
   if marketType=="HK":
-    text = open(PROJECT_ROOT + "/lib/港股代碼20160212.csv").read()
+    text = open(PROJECT_ROOT + "/lib/港股代碼20200906.csv", encoding="utf8").read()
     found=re.search(regStr,text,re.M|re.I)
     if found!=None:  
       return found.group(1).strip()  #返回港股代號
     else:
       try:
-        f1 = open(PROJECT_ROOT + "/lib/symbol" + marketType +  ".csv",encoding="utf-8")
+        f1 = open(PROJECT_ROOT + "/lib/symbol" + marketType +  ".csv",encoding="utf8")
         reader=csv.reader(f1)
         fieldNames = reader.__next__()
         for row in reader:
@@ -197,7 +201,7 @@ def getStockIdFromCSV(marketType, stockName): #return None if stockName not foun
         pass
     return None
   try:
-      f1 = open(PROJECT_ROOT + "/lib/symbol" + marketType +  ".csv",encoding="utf-8")
+      f1 = open(PROJECT_ROOT + "/lib/symbol" + marketType +  ".csv",encoding="utf8")
       reader=csv.reader(f1)
       fieldNames = reader.__next__()
       for row in reader:
@@ -212,7 +216,7 @@ def getStockIdFromCSV(marketType, stockName): #return None if stockName not foun
 
 def getSourceFromCustomCSV(marketType, stockId): #return None if stockName not found
   try:
-    f1 = open(PROJECT_ROOT + "/lib/symbol" + marketType +  ".csv",encoding="utf-8")
+    f1 = open(PROJECT_ROOT + "/lib/symbol" + marketType +  ".csv", encoding="utf8")
     reader=csv.reader(f1)
     fieldNames = reader.__next__()
     for row in reader:
@@ -226,18 +230,18 @@ def getSourceFromCustomCSV(marketType, stockId): #return None if stockName not f
 
 def getMarketId(marketType, stockId):
   if marketType=="TW":  #台股上市或上櫃
-    text = open(PROJECT_ROOT + "/lib/台股上市公司20171219.csv").read()
+    text = open(PROJECT_ROOT + "/lib/台股上市公司20200906.csv", encoding='utf8').read()
     if re.search(stockId, text, re.M|re.I) != None:  return marketType
     else:
       return 'TWO' #可能是上市公司, 但檔案太舊查不到
   if marketType=="US":
     str= r'"' + stockId +r'"' 
     #print(str)
-    text = open(PROJECT_ROOT + "/lib/NYSEcompanylist.csv").read()
+    text = open(PROJECT_ROOT + "/lib/NYSEcompanylist.csv", encoding='utf8').read()
     if re.search(str, text, re.M|re.I) != None:  return "NYSE"
-    text = open(PROJECT_ROOT + "/lib/AMEXcompanylist.csv").read()
+    text = open(PROJECT_ROOT + "/lib/AMEXcompanylist.csv", encoding='utf8').read()
     if re.search(str, text, re.M|re.I) != None:  return "NYSE"  #AMEX is acquire by NASDAQ
-    text = open(PROJECT_ROOT + "/lib/NASDAQcompanylist.csv").read()
+    text = open(PROJECT_ROOT + "/lib/NASDAQcompanylist.csv", encoding='utf8').read()
     if re.search(str, text, re.M|re.I) != None:  return "NASDAQ"
     return marketType
   if marketType=="HK":

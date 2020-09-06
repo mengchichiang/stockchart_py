@@ -40,12 +40,13 @@ def downloadDataHistory(stockId, marketType):
   for i in range(int(fromYear), int(toYear)+1):
     startDate = str(i) + "-01-01"
     endDate = str(i) + "-12-31"
-    #print("processing year " + str(i) + "...")
+    print("processing year " + str(i) + "...")
     #print(historyDoneYearAry)
     if str(i) not in  historyDoneYearAry:
       if str(i) == currentYear:
         setattr(HistoryData._meta, "db_table", "history_" + marketType.lower())
         lastData=HistoryData.select().where(HistoryData.stockid==stockId).order_by(HistoryData.date.desc()).first()
+        #print(lastData.date.year)
         if lastData != None and lastData.date.strftime("%Y") == currentYear:
           startDate=(lastData.date + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
         endDate = currentDate

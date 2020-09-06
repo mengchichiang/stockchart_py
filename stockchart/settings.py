@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(PROJECT_ROOT, ...)
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = os.path.join(PROJECT_ROOT, "static/") #"python manage.py collectstatic" will copy all static files  to this floder.
 
 # Quick-start development settings - unsuitable for production
@@ -129,8 +129,17 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 #user defined static file directory for django STATICFILES_FINDERS when Debug=True
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, "common_static"),
-)
+STATICFILES_DIRS = [
+    os.path.join(PROJECT_ROOT, "common_static/"),
+]
 
+DEBUG = True
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+LOGIN_EXEMPT_URLS = (
+    r'^$',
+    r'^portfolio/',
+    r'^manageData/',
+)
 

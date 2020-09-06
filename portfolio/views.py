@@ -60,6 +60,7 @@ def pfGroup_vf(request,pfGroup):
 
 def pfGroup_create_vf(request,pfGroup):
   from django import forms
+  #print(request)
   if request.method == "GET":
     return render(request, "portfolioGroup_create.html",{'form':forms})
   elif request.method == "POST":
@@ -92,17 +93,17 @@ def pfGroup_import_vf(request,pfGroup):
       f=open(PROJECT_ROOT + "/portfolio/static/upload/" + f1.name,encoding='utf-8')
       reader=csv.reader(f)
       fieldNames = reader.__next__()
-      print(fieldNames)
+      #print(fieldNames)
       fieldCount=len(fieldNames)
       for i in range(0,fieldCount):
         result.append([])
-      print(result) #result=[[],[],[],[],[]]
+      #print(result) #result=[[],[],[],[],[]]
       for row in reader:
         for i in range(0,fieldCount):
           if row[i]!="":
             result[i].append(row[i])
       f.close()
-      print(result)
+      #print(result)
       if pfGroup == 'HK': #tranform stockId+stockName to stockId
         for i in range(0,fieldCount):
           for j in range(0,len(result[i])):
@@ -210,16 +211,19 @@ def pfGroup_pfIndex_vf(request,pfGroup,pfIndex):
   #print("pfGroup:" + pfGroup) 
   #print("pfIndex:" + pfIndex) 
   pfIndexNo=int(pfIndex.replace("pf",""))
+  currentPortfolio = Portfolio.select().where(Portfolio.group  == pfGroup, Portfolio.index == pfIndexNo).dicts().first()
+  #print(currentPortfolio)
+  if currentPortfolio != None:
+    stockArray=stockUtil.evalTextArray(currentPortfolio["stock_array"]) #stock_array is converted form string type to array
+    currentPortfolio["stock_array"]=stockArray 
+  if currentPortfolio == None:
+    createPortfolio(pfGroup, "1", [])
+    return HttpResponseRedirect("/portfolio/" + pfGroup + "/pf0")
   qry = Portfolio.select().where(Portfolio.group  == pfGroup).order_by(Portfolio.index)
   for i in qry:
     pfNameArray.append({"group":i.group,"index":i.index,"name":i.name})
+  #print(currentPortfolio)  
   #print(pfNameArray)  
-  currentPortfolio = Portfolio.select().where(Portfolio.group  == pfGroup, Portfolio.index == pfIndexNo).dicts().first()
-  if currentPortfolio != None:
-    #print(currentPortfolio)
-    stockArray=stockUtil.evalTextArray(currentPortfolio["stock_array"]) #stock_array is converted form string type to array
-    currentPortfolio["stock_array"]=stockArray 
-    #print(currentPortfolio)
   return render(request,"portfolio.html",{"pfGroupArray":pfGroupArray, "pfGroup": pfGroup, "pfIndex": pfIndex, "pfNameArray": pfNameArray, "currentPortfolio": currentPortfolio})
 
 @csrf_exempt
@@ -244,11 +248,11 @@ def pfGroup_pfIndex_addSymbol_vf(request,pfGroup,pfIndex): #form post
       #print("stockSymbol1:" + stockUtil.cvNone(stockSymbol1))
       currentPortfolio = Portfolio.select().where(Portfolio.group  == pfGroup, Portfolio.index == pfIndexNo).dicts().first()
       if currentPortfolio != None:
-        #print(currentPortfolio)
         stockArray=stockUtil.evalTextArray(currentPortfolio["stock_array"]) #stock_array is converted form string type to array
-        stockArray.append( {"stockId":stockId , "stockName":stockName, "marketType":marketType});
+        stockArray.append( {"stockId":stockId.upper() , "stockName":stockName, "marketType":marketType});
         q = Portfolio.update(stock_array=stockArray).where(Portfolio.id == currentPortfolio["id"])
         q.execute()
+        #print(currentPortfolio)
       #if no portfolio in pfGroup, addSymbol do nothing. User must add symbol by create portfolio menju.
       else:
         from django.contrib import messages

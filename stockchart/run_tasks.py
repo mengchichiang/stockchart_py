@@ -1,3 +1,7 @@
+'''
+  run_tasks.py is for download history data.
+  If you run this file and use SQLite, you must assign sqlite database file with full file path in config.ini. 
+'''
 import os
 curDir = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(curDir)

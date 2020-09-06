@@ -1,41 +1,27 @@
 # stockchart_py
 Stockchart is portfolio managment, Historical quotes downloader and plot stock chart.
-It is used for Taiwan, HongKong and US stock market.
+It is used for Taiwan, HongKong and US stock market. SQLite is default database after version 2.0.
+If you want to use PostgreSQL, you could modify config.ini file and reference to README.md of version 1.4 to do setting.
 
 ## Quick start
-1. install postgresql
-2. add user account and database to postgresql
- ```
-  $sudo su - postgres
-  $psql
-  postgres=# CREATE ROLE test LOGIN PASSWORD '1234' NOSUPERUSER NOINHERIT NOCREATEDB NOCREATEROLE;
-  postgres=# CREATE DATABASE stockdb WITH OWNER = test ENCODING = 'UTF8' TABLESPACE = pg_default;
-  postgres=# \q
- ```
-3. `$git clone https://github.com/mengchichiang/stockchart_py.git`
-4. install python3 package
-5. create virtual environment
+1. `$git clone https://github.com/mengchichiang/stockchart_py.git`
+2. install python3 package
+3. create virtual environment
  ```
   $virtualenv stockchart
   $source stockchart/bin/activate
  ```
-6. install package
+4. install package
  ```
   $pip install -r requirements.txt
 
  ```
-7. server run
+5. server run
  ```
   $. python manage.py runserver localhost:8000
  ```
-8. open browser 
+6. open browser 
     http://localhost:8000/
-
-9. login
- ```
- user name:test
- password:1234
- ```
 
 ## Usage
 
@@ -51,7 +37,6 @@ It is used for Taiwan, HongKong and US stock market.
 ### config.ini
   * Setup login user name and password.
   * Setup download start year.
-  * Stock market can be defined in pfGroupArray, but do not change the market name CUS, US, TW, HK.
 
 ###  customize stock symbol, market and data download source.
    Group is stock market name. If you want to define your stock market, you should do as follows: 
@@ -64,5 +49,4 @@ It is used for Taiwan, HongKong and US stock market.
 ## License
 
 MIT.
-
 
