@@ -5,4 +5,4 @@ peewee==2.10.1
 psycopg2==2.7.1
 pyquery==1.2.17
 SQLAlchemy==1.1.11
-fake_useragent==0.1.11
+fake-useragent==1.1.1
